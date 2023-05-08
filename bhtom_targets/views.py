@@ -12,7 +12,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.forms import HiddenInput
 from django.http import HttpResponseRedirect, QueryDict, StreamingHttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -400,6 +400,12 @@ class TargetDetailView(Raise403PermissionRequiredMixin, DetailView):
     """
     permission_required = 'bhtom_targets.view_target'
     model = Target
+
+    def get_object(self, queryset=None):
+
+        name = self.kwargs.get('name', None)
+        obj = get_object_or_404(Target, name=name)
+        return obj
 
     def get_context_data(self, *args, **kwargs):
         """
