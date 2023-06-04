@@ -400,7 +400,8 @@ class TargetDetailView(Raise403PermissionRequiredMixin, DetailView):
     """
     permission_required = 'bhtom_targets.view_target'
     model = Target
-
+    slug_field = 'name'
+    slug_url_kwarg = 'name'
     def get_context_data(self, *args, **kwargs):
         """
         Adds the ``DataProductUploadForm`` to the context and prepopulates the hidden fields.
