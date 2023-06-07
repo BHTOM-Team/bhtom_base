@@ -15,3 +15,11 @@ dl {
 span.featured {
   pointer-events: none;
 }
+
+.container {
+  margin-left: 0px;
+}
+
+.target-right > * {
+  width: 1000px;
+}
