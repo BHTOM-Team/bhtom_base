@@ -332,3 +332,10 @@ def target_table(targets):
     by default
     """
     return {'targets': targets}
+
+@register.filter
+def get_item(dictionary, key):
+    """
+    Custom filter that retrieves the value of a dictionary based on a given key.
+    """
+    return dictionary.get(key)
