@@ -52,7 +52,7 @@ class PhotometryProcessor(DataProcessor):
             raise InvalidFileFormatException('Empty table or invalid file type')
 
         for datum in data:
-            time = Time(float(datum['time']), format='mjd')
+            time = Time(float(datum['time']), format='mjd', scale='utc')
             utc = TimezoneInfo(utc_offset=0 * units.hour)
             value: DatumValue = DatumValue(
                 mjd=time.mjd,

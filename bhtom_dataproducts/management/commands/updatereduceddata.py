@@ -38,10 +38,10 @@ class Command(BaseCommand):
         for target in targets:
             for class_name, clazz in broker_classes.items():
                 #if (len(sources) > 0 and class_name in sources) or (len(sources) == 0):
-                #print(class_name)
                 try:
                     clazz.process_reduced_data(target)
                 except HTTPError:
+                    print("ERROR IN BROKER: ",class_name)
                     failed_records[class_name] = target.id
 
         if len(failed_records) == 0:
