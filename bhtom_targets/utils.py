@@ -79,6 +79,7 @@ def import_targets(targets):
         target_names = {}
         target_fields = {}
 
+        #gets all possible source names, written in upper case
         uppercase_source_names = [sc[0].upper() for sc in settings.SOURCE_CHOICES]
 
         for k in row:
@@ -101,8 +102,6 @@ def import_targets(targets):
                 if name:
                     source_name = name[0].upper().replace('_NAME', '')
                     TargetName.objects.create(target=target, source_name=source_name, name=name[1])
-
-            target.type=Target.SIDEREAL  #temp - fixed to sideral only
 
             run_hook('target_post_save', target=target, created=True)
 
