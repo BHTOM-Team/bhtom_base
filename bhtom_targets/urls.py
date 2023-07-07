@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import TargetCreateView, TargetUpdateView, TargetDetailView, TargetNameSearchView
-from .views import TargetDeleteView, TargetListView, TargetImportView, TargetExportView
+from .views import TargetDeleteView, TargetListView, TargetExportView
 from .views import TargetGroupingView, TargetGroupingDeleteView, TargetGroupingCreateView, TargetAddRemoveGroupingView
 
 from .api_views import TargetViewSet, TargetExtraViewSet, TargetNameViewSet
@@ -18,7 +18,6 @@ urlpatterns = [
     path('', TargetListView.as_view(), name='list'),
     path('targetgrouping/', TargetGroupingView.as_view(), name='targetgrouping'),
     path('create/', TargetCreateView.as_view(), name='create'),
-    path('import/', TargetImportView.as_view(), name='import'),
     path('export/', TargetExportView.as_view(), name='export'),
     path('add-remove-grouping/', TargetAddRemoveGroupingView.as_view(), name='add-remove-grouping'),
     path('name/<str:name>', TargetNameSearchView.as_view(), name='name-search'),

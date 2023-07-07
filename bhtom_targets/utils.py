@@ -74,11 +74,12 @@ def import_targets(targets):
     base_target_fields = [field.name for field in Target._meta.get_fields()]
     for index, row in enumerate(targetreader):
         # filter out empty values in base fields, otherwise converting empty string to float will throw error
-        row = {k: v for (k, v) in row.items() if not (k in base_target_fields and not v)}
+        row = {k.strip(): v.strip() for (k, v) in row.items() if not (k.strip() in base_target_fields and not v.strip())}
         target_extra_fields = []
         target_names = {}
         target_fields = {}
 
+        #gets all possible source names, written in upper case
         uppercase_source_names = [sc[0].upper() for sc in settings.SOURCE_CHOICES]
 
         for k in row:
@@ -101,8 +102,6 @@ def import_targets(targets):
                 if name:
                     source_name = name[0].upper().replace('_NAME', '')
                     TargetName.objects.create(target=target, source_name=source_name, name=name[1])
-
-            target.type=Target.SIDEREAL  #temp - fixed to sideral only
 
             run_hook('target_post_save', target=target, created=True)
 
