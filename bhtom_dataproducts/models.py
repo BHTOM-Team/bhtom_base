@@ -98,9 +98,23 @@ def data_product_path(instance, filename):
     """
     # Uploads go to MEDIA_ROOT
     if instance.observation_record is not None:
-        return '{0}/{1}/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
+        return '{0}/{1}/data/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
     else:
-        return '{0}/none/{1}'.format(instance.target.name, filename)
+        return '{0}/none/data/{1}'.format(instance.target.name, filename)
+
+
+def fits_data_product_path(instance, filename):
+    if instance.observation_record is not None:
+        return '{0}/{1}/fits/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
+    else:
+        return '{0}/none/fits/{1}'.format(instance.target.name, filename)
+
+
+def photometry_data_product_path(instance, filename):
+    if instance.observation_record is not None:
+        return '{0}/{1}/photometry/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
+    else:
+        return '{0}/none/photometry/{1}'.format(instance.target.name, filename)
 
 
 class DataProductGroup(models.Model):
@@ -184,6 +198,8 @@ class DataProduct(models.Model):
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
     data = models.FileField(upload_to=data_product_path, null=True, default=None)
+    photometry_data = models.FileField(upload_to=photometry_data_product_path, null=True, default=None)
+    fits_data = models.FileField(upload_to=fits_data_product_path, null=True, default=None)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
     created = models.DateTimeField(auto_now_add=True)
@@ -191,6 +207,7 @@ class DataProduct(models.Model):
     data_product_type = models.CharField(max_length=50, blank=True, default='')
     featured = models.BooleanField(default=False)
     thumbnail = models.FileField(upload_to=data_product_path, null=True, default=None)
+    dryRun = models.BooleanField(default=False, verbose_name='Dry Run (no data will be stored in the database)')
 
     class Meta:
         ordering = ('-created',)
