@@ -11,7 +11,7 @@ from bhtom_base.bhtom_dataproducts.models import ReducedDatum
 
 from bhtom_base.bhtom_dataproducts.models import DatumValue, DataProduct
 
-DEFAULT_DATA_PROCESSOR_CLASS = 'bhtom_dataproducts.data_processor.DataProcessor'
+DEFAULT_DATA_PROCESSOR_CLASS = 'bhtom_base.bhtom_dataproducts.data_processor.DataProcessor'
 
 
 def run_data_processor(dp):
