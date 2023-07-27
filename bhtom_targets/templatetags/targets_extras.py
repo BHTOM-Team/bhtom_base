@@ -339,3 +339,18 @@ def get_item(dictionary, key):
     Custom filter that retrieves the value of a dictionary based on a given key.
     """
     return dictionary.get(key)
+
+# @register.filter
+# def trim_chars(value, start, end):
+#     """
+#     Custom filter to return trimmed string from start index until end index (inclusive)"""
+#     if len(value) > end:
+#         return value[start:end+1]
+#     else:
+#         return value[start:]
+    
+@register.filter
+def trim_chars(value, start):
+    """
+    Custom filter to return trimmed string from start index"""
+    return str(value)[start:]
