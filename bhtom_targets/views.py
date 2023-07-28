@@ -27,6 +27,8 @@ from guardian.shortcuts import get_objects_for_user, get_groups_with_perms, assi
 from django_tables2 import Table
 from django_tables2.views import SingleTableMixin
 
+from bhtom2.bhtom_targets.utils import get_nonempty_names_from_queryset, check_for_existing_alias, \
+    check_duplicate_source_names
 from bhtom2.external_service.data_source_information import PRETTY_SURVEY_NAME, get_pretty_survey_name
 from bhtom_base.bhtom_common.hints import add_hint
 from bhtom_base.bhtom_common.hooks import run_hook
@@ -42,8 +44,7 @@ from bhtom_base.bhtom_targets.groups import (
     move_all_to_grouping, move_selected_to_grouping
 )
 from bhtom_base.bhtom_targets.models import Target, TargetList, TargetName
-from bhtom_base.bhtom_targets.utils import import_targets, export_targets, get_nonempty_names_from_queryset, \
-    check_duplicate_source_names, check_for_existing_alias
+from bhtom_base.bhtom_targets.utils import import_targets, export_targets
 
 logger = logging.getLogger(__name__)
 

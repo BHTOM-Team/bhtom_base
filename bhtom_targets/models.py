@@ -132,6 +132,12 @@ class Target(models.Model):
         ('JPL_MAJOR_PLANET', 'JPL Major Planet')
     )
 
+    def photometry_plot_path(self, filename):
+        return '{0}/photometry_plot/{1}'.format(self.name, filename)
+
+    def spectroscopy_plot_path(self, filename):
+        return '{0}/spectroscopy_plot/{1}'.format(self.name, filename)
+
     name = models.CharField(
         max_length=100, default='', verbose_name='Name', help_text='The name of this target e.g. Barnard\'s star.',
         unique=True
@@ -226,6 +232,45 @@ class Target(models.Model):
     perihdist = models.FloatField(
         null=True, blank=True, verbose_name='Perihelion Distance', help_text='AU'
     )
+
+    classification = models.CharField(
+        max_length=50, verbose_name='classification', null=True, blank=True
+    )
+    discovery_date = models.DateTimeField(
+        verbose_name='discovery date', null=True, blank=True
+    )
+    mjd_last = models.FloatField(
+        verbose_name='mjd last', null=True, blank=True
+    )
+    mag_last = models.FloatField(
+        verbose_name='mag last', null=True, blank=True
+    )
+    importance = models.FloatField(
+        verbose_name='importance', null=True, blank=True
+    )
+    cadence = models.FloatField(
+        verbose_name='cadence', null=True, blank=True
+    )
+    priority = models.FloatField(
+        verbose_name='priority', null=True, blank=True
+    )
+    sun_separation = models.FloatField(
+        verbose_name='sun separation', null=True, blank=True
+    )
+    creation_date = models.DateTimeField(
+        verbose_name='creation date', null=True, blank=True
+    )
+    constellation = models.CharField(max_length=50,
+        verbose_name='constellation', null=True, blank=True
+    )
+    dont_update_me = models.BooleanField(
+        verbose_name='dont update_me', null=True, blank=True
+    )
+    phot_class = models.CharField(max_length=50,
+        verbose_name='phot class', null=True, blank=True
+    )
+    photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, default=None)
+    spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, default=None)
 
     @transaction.atomic
     def save(self, *args, **kwargs):

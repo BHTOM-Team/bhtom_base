@@ -1,6 +1,3 @@
-from typing import Dict, Any, Tuple, List
-
-from django.db.models import Count
 
 import csv
 from .models import Target, TargetExtra, TargetName
@@ -10,8 +7,6 @@ from django.db.models.functions.math import ACos, Cos, Radians, Pi, Sin
 from django.conf import settings
 from math import radians
 from bhtom_base.bhtom_common.hooks import run_hook
-from astropy.coordinates import Angle
-from astropy import units as u
 
 
 # NOTE: This saves locally. To avoid this, create file buffer.
@@ -102,7 +97,7 @@ def import_targets(targets):
                 if name:
                     source_name = name[0].upper().replace('_NAME', '')
                     TargetName.objects.create(target=target, source_name=source_name, name=name[1])
-
+#todo
             run_hook('target_post_save', target=target, created=True)
 
             targets.append(target)
@@ -154,104 +149,3 @@ def cone_search_filter(queryset, ra, dec, radius):
     return queryset.annotate(separation=separation).filter(separation__lte=radius)
 
 
-def get_aliases_from_queryset(queryset: Dict[str, Any]) -> Tuple[List, List]:
-    """
-    Extracts the passed aliases from the form queryset.
-
-    :param queryset: data extracted from form as a dictionary
-    :type queryset: Dict[str, Any]
-
-    :returns: two lists- source names (e.g. survey names) and corresponding target names
-    :rtype: Tuple[List, List]
-
-    """
-    target_source_names = [v for k, v in queryset.items() if
-                           k.startswith('alias') and k.endswith('-source_name')]
-    target_name_values = [v for k, v in queryset.items() if
-                          k.startswith('alias') and k.endswith('-name')]
-    return target_source_names, target_name_values
-
-
-def get_nonempty_names_from_queryset(queryset: Dict[str, Any]) -> List[Tuple[str, str]]:
-    """
-    Extracts the non-empty aliases from the form queryset.
-
-    :param queryset: data extracted from form as a dictionary
-    :type queryset: Dict[str, Any]
-
-    :returns: list of (source_name, target_name)
-    :rtype: List[Tuple[str, str]]
-    """
-    target_source_names, target_name_values = get_aliases_from_queryset(queryset)
-    return [(source_name, name) for source_name, name in zip(target_source_names, target_name_values) if
-                    source_name.strip() and name.strip()]
-
-
-def check_duplicate_source_names(target_names: List[Tuple[str, str]]) -> bool:
-    """
-    Checks for target names with duplicate source names.
-
-    :param target_names: list of (source_name, target_name)
-    :type target_names: List[Tuple[str, str]]
-
-    :returns: are there duplicate source names
-    :rtype: bool
-    """
-    nonempty_source_names: List[str] = [s for s, _ in target_names]
-    return len(nonempty_source_names) != len(set(nonempty_source_names))
-
-
-def check_for_existing_alias(target_names: List[Tuple[str, str]]) -> bool:
-    return sum([len(TargetName.objects.filter(name=alias)) for _, alias in target_names])>0
-
-def check_for_existing_coords(ra:float, dec:float, radius:float, queryset: Dict[str, Any]) -> List[Tuple[str, str]]:
-    """
-    Extracts the cone_search found targets
-
-    :param ra: RightAscension to search (decimal points)
-    :type ra: float
-
-    :param dec: Declination to search (decimal points)
-    :type dec: float
-
-    :param radius: search radius in degrees
-    :type radius: float
-
-    :param queryset: data extracted from form as a dictionary
-    :type queryset: Dict[str, Any]
-
-    :returns: list of target names at these coordinates
-    :rtype: List[str]
-    """
-    existing_coords_names = []
-    try:
-        cc=cone_search_filter(queryset, ra, dec, radius)
-        for target in cc:
-            existing_coords_names.append(target.name)
-    except Exception as e:
-        pass
-
-    return existing_coords_names
-
-def coords_to_degrees(value, c_type):
-    """
-    Converts from any type of coordinate to decimal degrees
-
-    :param value: Ra or Dec
-    :type value: any (float or string)
-
-    :param c_type: 'ra' or 'dec' tells if the value is RA or Dec
-    :type c_type: string
-    """
-    try:
-        a = float(value)
-        return a
-    except ValueError:
-        try:
-            if c_type == 'ra':
-                a = Angle(value, unit=u.hourangle)
-            else:
-                a = Angle(value, unit=u.degree)
-            return a.to(u.degree).value
-        except Exception:
-            raise Exception('Invalid format. Please use sexigesimal or degrees')
