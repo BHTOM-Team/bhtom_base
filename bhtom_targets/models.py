@@ -154,10 +154,10 @@ class Target(models.Model):
         help_text='The time which this target was changed in the TOM database.'
     )
     ra = models.FloatField(
-        null=True, blank=True, verbose_name='Right Ascension', help_text='Right Ascension, in degrees.'
+        null=True, blank=True, verbose_name='Right Ascension', help_text='Right Ascension, in degrees.', db_index=True
     )
     dec = models.FloatField(
-        null=True, blank=True, verbose_name='Declination', help_text='Declination, in degrees.'
+        null=True, blank=True, verbose_name='Declination', help_text='Declination, in degrees.', db_index=True
     )
     epoch = models.FloatField(
         null=True, blank=True, verbose_name='Epoch', help_text='Julian Years. Max 2100.'
@@ -234,10 +234,12 @@ class Target(models.Model):
     )
 
     classification = models.CharField(
-        max_length=50, verbose_name='classification', null=True, blank=True
+        max_length=50, verbose_name='classification',
+        help_text='Classification of the object (e.g. variable star, microlensing event)'
     )
     discovery_date = models.DateTimeField(
-        verbose_name='discovery date', null=True, blank=True
+        verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH-MM-SS, or leave blank',
+        null=True, blank=True
     )
     mjd_last = models.FloatField(
         verbose_name='mjd last', null=True, blank=True
@@ -246,10 +248,12 @@ class Target(models.Model):
         verbose_name='mag last', null=True, blank=True
     )
     importance = models.FloatField(
-        verbose_name='importance', null=True, blank=True
+        verbose_name='importance',
+        help_text='Target importance as an integer 0-10 (10 is the highest)'
     )
     cadence = models.FloatField(
-        verbose_name='cadence', null=True, blank=True
+        verbose_name='cadence',
+        help_text='Requested cadence (0-100 days)'
     )
     priority = models.FloatField(
         verbose_name='priority', null=True, blank=True
@@ -261,16 +265,19 @@ class Target(models.Model):
         verbose_name='creation date', null=True, blank=True
     )
     constellation = models.CharField(max_length=50,
-        verbose_name='constellation', null=True, blank=True
-    )
+                                     verbose_name='constellation', null=True, blank=True
+                                     )
     dont_update_me = models.BooleanField(
         verbose_name='dont update_me', null=True, blank=True
     )
     phot_class = models.CharField(max_length=50,
-        verbose_name='phot class', null=True, blank=True
-    )
+                                  verbose_name='phot class', null=True, blank=True
+                                  )
     photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, default=None)
     spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, default=None)
+    data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
+    filter_last = models.FloatField(verbose_name='filter last', null=True, blank=True)
+    cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
 
     @transaction.atomic
     def save(self, *args, **kwargs):

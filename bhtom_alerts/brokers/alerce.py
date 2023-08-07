@@ -8,9 +8,9 @@ from django import forms
 from django.core.cache import cache
 
 
-from tom_alerts.alerts import GenericAlert, GenericBroker, GenericQueryForm
-from tom_targets.models import Target
-from tom_dataproducts.models import ReducedDatum
+from bhtom_base.bhtom_alerts.alerts import GenericAlert, GenericBroker, GenericQueryForm
+from bhtom_base.bhtom_targets.models import Target
+from bhtom_base.bhtom_dataproducts.models import ReducedDatum
 
 logger = logging.getLogger(__name__)
 
