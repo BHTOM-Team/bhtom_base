@@ -307,11 +307,12 @@ def target_distribution(targets):
     targets_info = []
     for target in targets:
         classification=target.extra_fields.get('classification')
+        if classification is None: classification='-'
         last_mag = target.extra_fields.get('mag_last') 
+        if last_mag is None: last_mag='-'
         ra = target.ra
         dec = target.dec
         name = target.name
-        if last_mag is None: last_mag='-'
         targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'last_mag':last_mag})
 #    targets_list = list(targets.values('ra', 'dec','name'))  # replace 'field1', 'field2' with actual field names
 #    print(targets_info)
