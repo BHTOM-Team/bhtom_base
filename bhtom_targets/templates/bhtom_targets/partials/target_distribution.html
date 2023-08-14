@@ -14,8 +14,7 @@
         showCooGrid: false, showCooGridControl: true,
         expandLayersControl: false});
 
-        var planets = {{ planets|safe}}
-
+        var planets = {{ planets|safe}};
         
         var circleM = A.circle(planets.moon_ra, planets.moon_dec, 30, {color: 'grey', lineWidth: 1});
         var overlayM = A.graphicOverlay({name: 'Moon 30 deg',color: 'grey', lineWidth: 1});
