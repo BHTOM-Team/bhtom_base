@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from astroplan import moon_illumination
 from astropy import units as u
-from astropy.coordinates import Angle, get_moon, SkyCoord
+from astropy.coordinates import Angle, get_sun, get_moon, SkyCoord
 from astropy.time import Time
 from django import template
 from django.conf import settings
@@ -15,6 +15,8 @@ from plotly import graph_objs as go
 from bhtom_base.bhtom_observations.utils import get_sidereal_visibility
 from bhtom_base.bhtom_targets.models import Target, TargetExtra, TargetList
 from bhtom_base.bhtom_targets.forms import TargetVisibilityForm
+
+from math import atan
 
 register = template.Library()
 
@@ -225,6 +227,15 @@ def target_distribution(targets):
     """
     Displays a plot showing on a map the locations of all sidereal targets in the TOM.
     """
+    from astropy.time import Time
+    jd_now = Time(datetime.utcnow()).jd
+
+    sun_pos = get_sun(Time(datetime.utcnow()))
+    alpha_sun, delta_sun = sun_pos.ra.deg, sun_pos.dec.deg
+    moon_pos = get_moon(Time(datetime.utcnow()))
+    alpha_moon = moon_pos.ra.deg
+    delta_moon = moon_pos.dec.deg
+
     locations = targets.filter(type=Target.SIDEREAL).values_list('ra', 'dec', 'name')
     data = [
         dict(
@@ -246,6 +257,24 @@ def target_distribution(targets):
             type='scattergeo'
         )
     ]
+
+    data.append(
+        #sun
+        dict(
+            lon=[alpha_sun], lat=[delta_sun], text=['SUN'], hoverinfo='text', mode='markers',
+            marker=dict(size=50, color='yellow', opacity=0.5),
+            type='scattergeo'
+        )
+    )
+    data.append(
+        #moon
+        dict(
+            lon=[alpha_moon], lat=[delta_moon], text=['Moon'], hoverinfo='text', mode='markers',
+            marker=dict(size=50, color='grey', opacity=0.5),
+            type='scattergeo'
+        )
+    )
+
     layout = {
         'title': 'Target Distribution (sidereal)',
         'hovermode': 'closest',
