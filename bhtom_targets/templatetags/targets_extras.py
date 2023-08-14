@@ -316,7 +316,21 @@ def target_distribution(targets):
         targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'last_mag':last_mag})
 #    targets_list = list(targets.values('ra', 'dec','name'))  # replace 'field1', 'field2' with actual field names
 #    print(targets_info)
-    return {'targets': targets_info}
+
+    sun_pos = get_sun(Time(datetime.utcnow()))
+    alpha_sun, delta_sun = sun_pos.ra.deg, sun_pos.dec.deg
+    moon_pos = get_moon(Time(datetime.utcnow()))
+    alpha_moon = moon_pos.ra.deg
+    delta_moon = moon_pos.dec.deg
+
+    planets = {
+    'sun_ra': alpha_sun,
+    'sun_dec': delta_sun,
+    'moon_ra': alpha_moon,
+    'moon_dec': delta_moon
+    }
+    
+    return {'targets': targets_info, 'planets':planets}
 
 @register.filter
 def deg_to_sexigesimal(value, fmt):
