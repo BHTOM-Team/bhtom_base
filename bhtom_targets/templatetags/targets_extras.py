@@ -222,85 +222,100 @@ def moon_distance(target, day_range=30, width=600, height=400, background=None, 
     return {'plot': moon_distance_plot}
 
 
+# @register.inclusion_tag('bhtom_targets/partials/target_distribution.html')
+# def target_distribution(targets):
+#     """
+#     Displays a plot showing on a map the locations of all sidereal targets in the TOM.
+#     """
+#     from astropy.time import Time
+#     jd_now = Time(datetime.utcnow()).jd
+
+#     sun_pos = get_sun(Time(datetime.utcnow()))
+#     alpha_sun, delta_sun = sun_pos.ra.deg, sun_pos.dec.deg
+#     moon_pos = get_moon(Time(datetime.utcnow()))
+#     alpha_moon = moon_pos.ra.deg
+#     delta_moon = moon_pos.dec.deg
+
+#     locations = targets.filter(type=Target.SIDEREAL).values_list('ra', 'dec', 'name')
+#     data = [
+#         dict(
+#             lon=[location[0] for location in locations],
+#             lat=[location[1] for location in locations],
+#             text=[location[2] for location in locations],
+#             hoverinfo='lon+lat+text',
+#             mode='markers',
+#             textfont_color='#d7d6d6',
+#             type='scattergeo'
+#         ),
+#         dict(
+#             lon=list(range(0, 360, 60)) + [180] * 4,
+#             lat=[0] * 6 + [-60, -30, 30, 60],
+#             text=list(range(0, 360, 60)) + [-60, -30, 30, 60],
+#             hoverinfo='none',
+#             mode='text',
+#             textfont_color='#d7d6d6',
+#             type='scattergeo'
+#         )
+#     ]
+
+#     data.append(
+#         #sun
+#         dict(
+#             lon=[alpha_sun], lat=[delta_sun], text=['SUN'], hoverinfo='text', mode='markers',
+#             marker=dict(size=50, color='yellow', opacity=0.5),
+#             type='scattergeo'
+#         )
+#     )
+#     data.append(
+#         #moon
+#         dict(
+#             lon=[alpha_moon], lat=[delta_moon], text=['Moon'], hoverinfo='text', mode='markers',
+#             marker=dict(size=50, color='grey', opacity=0.5),
+#             type='scattergeo'
+#         )
+#     )
+
+#     layout = {
+#         'title': 'Target Distribution (sidereal)',
+#         'hovermode': 'closest',
+#         'showlegend': False,
+#         'geo': {
+#             'projection': {
+#                 'type': 'mollweide',
+#             },
+#             'showcoastlines': False,
+#             'showland': False,
+#             'lonaxis': {
+#                 'showgrid': True,
+#                 'range': [0, 360],
+#             },
+#             'lataxis': {
+#                 'showgrid': True,
+#                 'range': [-90, 90],
+#             },
+#         },
+#         'paper_bgcolor': "#080404",
+#         'geo_bgcolor': "#080404",
+#         'geo_showlakes': False
+#     }
+#     figure = offline.plot(go.Figure(data=data, layout=layout), output_type='div', show_link=False)
+#     return {'figure': figure}
+
 @register.inclusion_tag('bhtom_targets/partials/target_distribution.html')
 def target_distribution(targets):
-    """
-    Displays a plot showing on a map the locations of all sidereal targets in the TOM.
-    """
-    from astropy.time import Time
-    jd_now = Time(datetime.utcnow()).jd
 
-    sun_pos = get_sun(Time(datetime.utcnow()))
-    alpha_sun, delta_sun = sun_pos.ra.deg, sun_pos.dec.deg
-    moon_pos = get_moon(Time(datetime.utcnow()))
-    alpha_moon = moon_pos.ra.deg
-    delta_moon = moon_pos.dec.deg
-
-    locations = targets.filter(type=Target.SIDEREAL).values_list('ra', 'dec', 'name')
-    data = [
-        dict(
-            lon=[location[0] for location in locations],
-            lat=[location[1] for location in locations],
-            text=[location[2] for location in locations],
-            hoverinfo='lon+lat+text',
-            mode='markers',
-            textfont_color='#d7d6d6',
-            type='scattergeo'
-        ),
-        dict(
-            lon=list(range(0, 360, 60)) + [180] * 4,
-            lat=[0] * 6 + [-60, -30, 30, 60],
-            text=list(range(0, 360, 60)) + [-60, -30, 30, 60],
-            hoverinfo='none',
-            mode='text',
-            textfont_color='#d7d6d6',
-            type='scattergeo'
-        )
-    ]
-
-    data.append(
-        #sun
-        dict(
-            lon=[alpha_sun], lat=[delta_sun], text=['SUN'], hoverinfo='text', mode='markers',
-            marker=dict(size=50, color='yellow', opacity=0.5),
-            type='scattergeo'
-        )
-    )
-    data.append(
-        #moon
-        dict(
-            lon=[alpha_moon], lat=[delta_moon], text=['Moon'], hoverinfo='text', mode='markers',
-            marker=dict(size=50, color='grey', opacity=0.5),
-            type='scattergeo'
-        )
-    )
-
-    layout = {
-        'title': 'Target Distribution (sidereal)',
-        'hovermode': 'closest',
-        'showlegend': False,
-        'geo': {
-            'projection': {
-                'type': 'mollweide',
-            },
-            'showcoastlines': False,
-            'showland': False,
-            'lonaxis': {
-                'showgrid': True,
-                'range': [0, 360],
-            },
-            'lataxis': {
-                'showgrid': True,
-                'range': [-90, 90],
-            },
-        },
-        'paper_bgcolor': "#080404",
-        'geo_bgcolor': "#080404",
-        'geo_showlakes': False
-    }
-    figure = offline.plot(go.Figure(data=data, layout=layout), output_type='div', show_link=False)
-    return {'figure': figure}
-
+    targets_info = []
+    for target in targets:
+        classification=target.extra_fields.get('classification')
+        last_mag = target.extra_fields.get('mag_last') 
+        ra = target.ra
+        dec = target.dec
+        name = target.name
+        if last_mag is None: last_mag='-'
+        targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'last_mag':last_mag})
+#    targets_list = list(targets.values('ra', 'dec','name'))  # replace 'field1', 'field2' with actual field names
+#    print(targets_info)
+    return {'targets': targets_info}
 
 @register.filter
 def deg_to_sexigesimal(value, fmt):
