@@ -17,6 +17,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from fits2image.conversions import fits_to_jpg
 
+from bhtom2.bhtom_observatory.models import Observatory, ObservatoryMatrix
 from bhtom_base.bhtom_observations.models import ObservationRecord
 from bhtom_base.bhtom_targets.models import Target
 
@@ -130,15 +131,34 @@ class DataProductGroup(models.Model):
     :param modified: The time at which this object was last changed.
     :type modified: datetime
     """
-    name = models.CharField(max_length=200)
-    created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
+    private = models.BooleanField(default=True, db_index=True)
 
     class Meta:
         ordering = ('-created',)
 
     def __str__(self):
         return self.name
+
+
+class DataProductGroup_user(models.Model):
+    """
+    Class representing a group of user in dataproduct group.
+    """
+
+    group = models.ForeignKey(DataProductGroup, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.BooleanField(default=False, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    active_flg = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __str__(self):
+        return self.user.username
 
 
 class DataProduct(models.Model):
@@ -197,17 +217,18 @@ class DataProduct(models.Model):
     )
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
-    data = models.FileField(upload_to=data_product_path, null=True, default=None)
+    data = models.FileField(upload_to=data_product_path, null=True, default=None, db_index=True)
     photometry_data = models.FileField(upload_to=photometry_data_product_path, null=True, default=None)
     fits_data = models.FileField(upload_to=fits_data_product_path, null=True, default=None)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
-    data_product_type = models.CharField(max_length=50, blank=True, default='')
+    data_product_type = models.CharField(max_length=50, blank=True, default='', db_index=True)
     featured = models.BooleanField(default=False)
     thumbnail = models.FileField(upload_to=data_product_path, null=True, default=None)
     dryRun = models.BooleanField(default=False, verbose_name='Dry Run (no data will be stored in the database)')
+    observatory = models.ForeignKey(ObservatoryMatrix, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ('-created',)

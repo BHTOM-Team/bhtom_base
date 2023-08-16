@@ -234,7 +234,7 @@ class Target(models.Model):
     )
 
     classification = models.CharField(
-        max_length=50, verbose_name='classification',
+        max_length=50, null=True, blank=True, verbose_name='classification',
         help_text='Classification of the object (e.g. variable star, microlensing event)'
     )
     discovery_date = models.DateTimeField(
@@ -249,11 +249,13 @@ class Target(models.Model):
     )
     importance = models.FloatField(
         verbose_name='importance',
-        help_text='Target importance as an integer 0-10 (10 is the highest)'
+        help_text='Target importance as an integer 0-10 (10 is the highest)',
+        default=0
     )
     cadence = models.FloatField(
         verbose_name='cadence',
-        help_text='Requested cadence (0-100 days)'
+        help_text='Requested cadence (0-100 days)',
+        default=0
     )
     priority = models.FloatField(
         verbose_name='priority', null=True, blank=True
@@ -276,7 +278,7 @@ class Target(models.Model):
     photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, default=None)
     spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, default=None)
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
-    filter_last = models.FloatField(verbose_name='filter last', null=True, blank=True)
+    last_filter = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
 
     @transaction.atomic
