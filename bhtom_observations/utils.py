@@ -1,4 +1,4 @@
-from astropy.coordinates import get_sun, SkyCoord
+from astropy.coordinates import get_body, SkyCoord
 from astropy import units
 from astropy.time import Time
 from astroplan import Observer, FixedTarget, time_grid_from_range
@@ -117,9 +117,9 @@ def get_astroplan_sun_and_time(start_time, end_time, interval):
     number_of_days = end.mjd - start.mjd
     if number_of_days*4 < float(interval)/2:
         # Hack to speed up calculation by factor of ~3
-        sun_coords = get_sun(time_range[int(len(time_range)/2)])
+        sun_coords = get_body("sun",time_range[int(len(time_range)/2)])
         sun = FixedTarget(name='sun', coord=SkyCoord(sun_coords.ra, sun_coords.dec, unit='deg'))
     else:
-        sun = get_sun(time_range)
+        sun = get_body("sun", time_range)
 
     return sun, time_range

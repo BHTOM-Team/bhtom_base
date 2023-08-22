@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from astroplan import FixedTarget
-from astropy.coordinates import get_sun, SkyCoord
+from astropy.coordinates import get_body, SkyCoord
 from astropy.time import Time
 
 from .factories import ObservingRecordFactory, ObservationTemplateFactory, SiderealTargetFactory, TargetNameFactory
@@ -376,7 +376,7 @@ class TestUpdatingObservations(TestCase):
 
 class TestGetVisibility(TestCase):
     def setUp(self):
-        self.sun = get_sun(Time(datetime(2019, 10, 9, 13, 56)))
+        self.sun = get_body("sun",Time(datetime(2019, 10, 9, 13, 56)))
         self.target = Target(
             ra=(self.sun.ra.deg + 180) % 360,
             dec=-(self.sun.dec.deg),
