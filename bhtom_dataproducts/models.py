@@ -414,6 +414,7 @@ class ReducedDatum(models.Model):
     filter = models.CharField(max_length=100, null=True, default=None)
     wavelengths = ArrayField(models.FloatField(), null=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
+    active_flg = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (('target', 'data_type', 'mjd', 'value', 'value_list', 'filter', 'wavelengths'),)
@@ -442,3 +443,9 @@ class DatumValue:
     filter: Optional[str] = None
     data_type: Optional[str] = None
     extra_data: Optional[Dict[str, Any]] = None
+
+
+class BrokerCadence(models.Model):
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE, db_index=True)
+    broker_name = models.CharField(null=False, max_length=100, db_index=True)
+    last_update = models.DateTimeField(null=True, blank=True)
