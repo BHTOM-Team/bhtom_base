@@ -131,7 +131,7 @@ class DataProductGroup(models.Model):
     :param modified: The time at which this object was last changed.
     :type modified: datetime
     """
-    name = models.CharField(max_length=200, db_index=True)
+    name = models.CharField(max_length=200, db_index=True,unique=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
     private = models.BooleanField(default=True, db_index=True)
