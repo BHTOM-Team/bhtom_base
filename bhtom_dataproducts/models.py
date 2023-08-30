@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional
 
 from PIL import Image
 from astropy.io import fits
-from astropy.time import Time
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -131,7 +130,7 @@ class DataProductGroup(models.Model):
     :param modified: The time at which this object was last changed.
     :type modified: datetime
     """
-    name = models.CharField(max_length=200, db_index=True)
+    name = models.CharField(max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
     private = models.BooleanField(default=True, db_index=True)
@@ -217,9 +216,10 @@ class DataProduct(models.Model):
     )
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
     data = models.FileField(upload_to=data_product_path, null=True, default=None, db_index=True)
-    photometry_data = models.FileField(upload_to=photometry_data_product_path, null=True, default=None)
-    fits_data = models.FileField(upload_to=fits_data_product_path, null=True, default=None)
+    photometry_data = models.FileField(upload_to=photometry_data_product_path, null=True, default=None, db_index=True)
+    fits_data = models.FileField(upload_to=fits_data_product_path, null=True, default=None, db_index=True)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -389,35 +389,35 @@ class ReducedDatum(models.Model):
 
     """
 
-    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE, db_index=True)
-    user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL, db_index=True)
-    data_product = models.ForeignKey(DataProduct, null=True, on_delete=models.CASCADE, db_index=True)
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
+    data_product = models.ForeignKey(DataProduct, null=True, on_delete=models.CASCADE)
     data_type = models.CharField(
         max_length=100,
         default=''
     )
-    source_name = models.CharField(max_length=100, default='')
+    source_name = models.CharField(max_length=100, default='',  db_index=True)
     source_location = models.CharField(max_length=200, default='')
     mjd = models.FloatField(null=False)
     timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now, db_index=True)
-    observer = models.CharField(null=True, max_length=100, default='')
-    facility = models.CharField(null=True, max_length=100, default='')
-    value = models.FloatField(null=True, default=None)
+    observer = models.CharField(null=False, max_length=100, default='')
+    facility = models.CharField(null=False, max_length=100, default='')
+    value = models.FloatField(null=False)
     value_list = ArrayField(models.FloatField(), null=True, default=list)
     value_unit = models.CharField(
         max_length=100,
         choices=ReducedDatumUnit.choices,
         default=ReducedDatumUnit.MAGNITUDE
     )
-    error = models.FloatField(null=True, default=None)
+    error = models.FloatField(null=False, default=None)
     error_list = ArrayField(models.FloatField(), null=True, default=list)
-    filter = models.CharField(max_length=100, null=True, default=None)
+    filter = models.CharField(max_length=100, null=False)
     wavelengths = ArrayField(models.FloatField(), null=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
     active_flg = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = (('target', 'data_type', 'mjd', 'value', 'value_list', 'filter', 'wavelengths'),)
+        unique_together = (('target',  'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)
         get_latest_by = ('mjd',)
 
     def save(self, *args, **kwargs):
@@ -447,5 +447,9 @@ class DatumValue:
 
 class BrokerCadence(models.Model):
     target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE, db_index=True)
-    broker_name = models.CharField(null=False, max_length=100, db_index=True)
+    broker_name = models.CharField(null=False, max_length=50, db_index=True)
     last_update = models.DateTimeField(null=True, blank=True)
+    insert_row = models.IntegerField(null=True, default=0)
+
+    class Meta:
+        unique_together = (('target', 'broker_name'),)
