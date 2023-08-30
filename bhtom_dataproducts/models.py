@@ -447,7 +447,7 @@ class DatumValue:
 
 class BrokerCadence(models.Model):
     target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE, db_index=True)
-    broker_name = models.CharField(null=False, max_length=50, db_index=True)
+    broker_name = models.CharField(null=False, max_length=50)
     last_update = models.DateTimeField(null=True, blank=True)
     insert_row = models.IntegerField(null=True, default=0)
 
