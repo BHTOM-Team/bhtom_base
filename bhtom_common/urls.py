@@ -52,7 +52,7 @@ urlpatterns = [
     path('comment/<int:pk>/delete', CommentDeleteView.as_view(), name='comment-delete'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include((collect_api_urls(), 'api'), namespace='api')),
+    #path('api/', include((collect_api_urls(), 'api'), namespace='api')),
     path('api/token-auth/', views.obtain_auth_token)
     # The static helper below only works in development see
     # https://docs.djangoproject.com/en/2.1/howto/static-files/#serving-files-uploaded-by-a-user-during-development
