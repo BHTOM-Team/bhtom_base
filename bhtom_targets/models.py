@@ -133,10 +133,10 @@ class Target(models.Model):
     )
 
     def photometry_plot_path(self, filename):
-        return '{0}/photometry_plot/{1}'.format(self.name, filename)
+        return '/photometry/{0}'.format(filename)
 
     def spectroscopy_plot_path(self, filename):
-        return '{0}/spectroscopy_plot/{1}'.format(self.name, filename)
+        return '/spectroscopy/{0}'.format(filename)
 
     name = models.CharField(
         max_length=100, default='', verbose_name='Name', help_text='The name of this target e.g. Barnard\'s star.',
@@ -278,7 +278,7 @@ class Target(models.Model):
     photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, default=None)
     spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, default=None)
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
-    last_filter = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
+    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
 
     @transaction.atomic
