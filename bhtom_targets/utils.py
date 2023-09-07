@@ -97,7 +97,7 @@ def import_targets(targets):
                 if name:
                     source_name = name[0].upper().replace('_NAME', '')
                     TargetName.objects.create(target=target, source_name=source_name, name=name[1])
-#todo
+
             run_hook('target_post_save', target=target, created=True)
 
             targets.append(target)

@@ -396,7 +396,7 @@ class ReducedDatum(models.Model):
         max_length=100,
         default=''
     )
-    source_name = models.CharField(max_length=100, default='',  db_index=True)
+    source_name = models.CharField(max_length=100, default='', db_index=True)
     source_location = models.CharField(max_length=200, default='')
     mjd = models.FloatField(null=False, default=0)
     timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now, db_index=True)
@@ -417,7 +417,7 @@ class ReducedDatum(models.Model):
     active_flg = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = (('target',  'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)
+        unique_together = (('target', 'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)
         get_latest_by = ('mjd',)
 
     def save(self, *args, **kwargs):
@@ -453,3 +453,51 @@ class BrokerCadence(models.Model):
 
     class Meta:
         unique_together = (('target', 'broker_name'),)
+
+
+class CCDPhotJob(models.Model):
+    JOB_STATUS_CHOICES = [
+        ('P', 'Preparation'),
+        ('R', 'Running'),
+        ('F', 'Finished'),  # ccdphot finished, result not extracted
+        ('D', 'Done'),  # results sed back
+        ('E', 'Error'),  # ccdphot finished with error
+    ]
+    job_id = models.CharField(db_index=True, max_length=50)
+    instrument = models.CharField(max_length=50, blank=True,
+                                  help_text='instrument identification (not used by ccdphot)')
+    instrument_prefix = models.CharField(max_length=50, blank=True,
+                                         help_text='instrument prefix used to chose proper obsinfo')
+    webhook_id = models.CharField(max_length=20, blank=True,
+                                  help_text='id of webhook to be fired after ccdphot processing (not implemented yet)')
+    target_name = models.CharField(max_length=100, blank=True, help_text='name of the target from BHTOM')
+    target_ra = models.FloatField(default=0.0, null=True, help_text='ra in decimal format')
+    target_dec = models.FloatField(default=0.0, null=True, help_text='dec in decimal format')
+    username = models.CharField(max_length=150, blank=True, help_text='BHTOM username')
+    hashtag = models.CharField(max_length=255, blank=True, help_text='CPCS hashtag')
+    dry_run = models.CharField(max_length=5, blank=True, default="False",
+                               help_text='in format of "True" or "False" string')
+    fits_id = models.IntegerField(default=-1, null=True, help_text='ID of the BHTOM fits file')
+    priority = models.IntegerField(default=0, help_text='default = 0, lower number - higher priority')
+    start_time = models.DateTimeField(auto_now_add=True, db_index=True)
+    status_time = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=10, editable=False, choices=JOB_STATUS_CHOICES, default='P')
+    status_message = models.TextField(default='job created', blank=True, editable=False)
+    progress = models.FloatField(default=0.0, editable=False)
+    fits_file = models.FileField(upload_to='fits')
+    ccdphot_result = models.TextField(null=True, blank=True, editable=False)
+    ccdphot_result_file = models.TextField(null=True, blank=True, editable=False)
+    ccdphot_stdout_file = models.TextField(null=True, blank=True, editable=False)
+
+    fits_object = models.CharField(max_length=70, null=True)
+    fits_ra = models.FloatField(default=0.0, null=True)
+    fits_dec = models.FloatField(default=0.0, null=True)
+    fits_mjd = models.FloatField(default=0.0, null=True)
+    fits_hjd = models.FloatField(default=0.0, null=True)
+    fits_exp = models.FloatField(default=0.0, null=True)
+    fits_filter = models.CharField(max_length=70, null=True)
+    fits_origin = models.CharField(max_length=70, null=True)
+    fits_observat = models.CharField(max_length=70, null=True)
+    fits_telescop = models.CharField(max_length=70, null=True)
+    fits_instrume = models.CharField(max_length=70, null=True)
+    fits_observer = models.CharField(max_length=70, null=True)
