@@ -275,8 +275,8 @@ class Target(models.Model):
     phot_class = models.CharField(max_length=50,
                                   verbose_name='phot class', null=True, blank=True
                                   )
-    photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, default=None)
-    spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, default=None)
+    photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, blank=True, default=None)
+    spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None)
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
     filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
@@ -423,6 +423,10 @@ class TargetName(models.Model):
 
     class Meta:
         unique_together = ['source_name', 'target']
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        pass
 
     def __str__(self):
         return self.name
