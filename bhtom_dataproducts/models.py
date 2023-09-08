@@ -446,7 +446,7 @@ class DatumValue:
 
 
 class BrokerCadence(models.Model):
-    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE, db_index=True)
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
     broker_name = models.CharField(null=False, max_length=50)
     last_update = models.DateTimeField(null=True, blank=True)
     insert_row = models.IntegerField(null=True, default=0)
@@ -463,6 +463,7 @@ class CCDPhotJob(models.Model):
         ('D', 'Done'),  # results sed back
         ('E', 'Error'),  # ccdphot finished with error
     ]
+    dataProduct = models.ForeignKey(DataProduct, null=False, on_delete=models.CASCADE)
     job_id = models.CharField(db_index=True, max_length=50)
     instrument = models.CharField(max_length=50, blank=True,
                                   help_text='instrument identification (not used by ccdphot)')

@@ -421,6 +421,8 @@ class TargetName(models.Model):
         help_text='The time which this target name was changed in the TOM database.'
     )
 
+    url = models.CharField(max_length=250, null=True, blank=True)
+
     class Meta:
         unique_together = ['source_name', 'target']
 
