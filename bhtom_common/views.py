@@ -176,13 +176,14 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
     """
     model = Comment
 
+    def get_success_url(self):
+        messages.success(self.request, 'Successfully delete')
+        print(self.kwargs)
+        return reverse_lazy('bhtom_targets:detail', kwargs={'pk': self.kwargs['pk_target']})
+
     def delete(self, request, *args, **kwargs):
-        """
-        Method that handles the DELETE request for a ``Comment``. Validates that the user either authored the comment or
-        is a superuser, then deletes the ``Comment``.
-        """
+
         if request.user == self.get_object().user or request.user.is_superuser:
-            self.success_url = self.get_object().get_absolute_url()
             return super().delete(request, *args, **kwargs)
         else:
             return HttpResponseForbidden('Not authorized')
