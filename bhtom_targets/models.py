@@ -306,8 +306,8 @@ class Target(models.Model):
             target_extra.value = v
             target_extra.save()
 
-        if not created:
-            run_hook('target_post_save', target=self, created=created)
+        #if not created:
+            #run_hook('target_post_save', target=self, created=created)
 
     def __str__(self):
         return str(self.name)
@@ -425,10 +425,6 @@ class TargetName(models.Model):
 
     class Meta:
         unique_together = ['source_name', 'target']
-
-    @transaction.atomic
-    def save(self, *args, **kwargs):
-        pass
 
     def __str__(self):
         return self.name
