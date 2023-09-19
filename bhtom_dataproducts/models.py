@@ -202,6 +202,12 @@ class DataProduct(models.Model):
     :param thumbnail: The thumbnail file associated with this object. Only generated for FITS image files.
     :type thumbnail: FileField
     """
+    STATUS = [
+        ('C', 'TO DO'),
+        ('P', 'IN PROGRESS'),
+        ('S', 'SUCCESS'),
+        ('E', 'ERROR')
+    ]
 
     FITS_EXTENSIONS = {
         '.fits': 'PRIMARY',
@@ -215,6 +221,7 @@ class DataProduct(models.Model):
         help_text='Data product identifier used by the source of the data product.'
     )
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
+    status = models.CharField(max_length=1, choices=STATUS, default='C', db_index=True)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
     data = models.FileField(upload_to=data_product_path, null=True, default=None, db_index=True)
