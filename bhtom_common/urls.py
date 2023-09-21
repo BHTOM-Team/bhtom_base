@@ -33,6 +33,7 @@ router.register(r'groups', GroupViewSet, 'groups')
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='bhtom_common/index.html'), name='home'),
+    path('about/',TemplateView.as_view(template_name='bhtom_common/about.html'), name='about'),
     path('targets/', include('bhtom_base.bhtom_targets.urls', namespace='targets')),
     path('alerts/', include('bhtom_base.bhtom_alerts.urls', namespace='alerts')),
     path('comments/', include('django_comments.urls')),

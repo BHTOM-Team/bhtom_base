@@ -224,7 +224,7 @@ class DataProduct(models.Model):
     status = models.CharField(max_length=1, choices=STATUS, default='C', db_index=True)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
-    data = models.FileField(upload_to=data_product_path, null=True, default=None, db_index=True)
+    data = models.URLField(null=True, default='')
     photometry_data = models.FileField(upload_to=photometry_data_product_path, null=True, default=None, db_index=True)
     fits_data = models.FileField(upload_to=fits_data_product_path, null=True, default=None, db_index=True)
     extra_data = models.TextField(blank=True, default='')
