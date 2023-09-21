@@ -78,8 +78,10 @@ def target_groups(target):
     Widget displaying groups this target is in and controls for modifying group association for the given target.
     """
     groups = TargetList.objects.filter(targets=target)
+    groupings = TargetList.objects.exclude(targets=target).order_by('id')
     return {'target': target,
-            'groups': groups}
+            'groups': groups,
+            'groupings': groupings}
 
 
 @register.inclusion_tag('bhtom_targets/partials/target_plan.html', takes_context=True)

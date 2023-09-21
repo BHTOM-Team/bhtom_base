@@ -1,4 +1,26 @@
+{% load targets_extras %}
+
 <h4>Groups</h4>
+
+{%  if groupings %}
+    <form id="grouping-form" action="{% url 'targets:add-remove-grouping' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group d-flex justify-content-end align-items-baseline">
+            <label>Add target to group</label>
+            <select name="grouping" id="groupingSelect" class="form-control w-25 ml-1">
+
+                {% for grouping in groupings %}
+                    <option value="{{ grouping.id }}">{{ grouping.name }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="hidden" id="query_string" value="targetlist__name={{ groupings.0.id }}" name="query_string">
+            <input type="hidden" name="selected-target" value="{{ target.id }}"/>
+            <button type="submit" class="btn btn-outline-primary ml-1" name="add">Add</button>
+        </div>
+    </form>
+{% endif %}
+
 <table class="table table-striped">
     <thead>
     <tr>
@@ -9,29 +31,43 @@
     </thead>
     <tbody>
     {% for group in groups %}
-    <tr>
-        <td>
-            <form action="{% url 'targets:list' %}" method="GET">
-                <button type="submit" class="btn btn-link" name="targetlist__name" value="{{group.id}}" title="View Group">{{ group.name }}</button>
-            </form> 
-        </td>
-        <td valign="middle">{{ group.targets.count }}</td>        
-        <td>
-            <form action="{% url 'targets:add-remove-grouping' %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" title="Remove Target from Group" class="btn btn-danger" name="remove">Remove</button>
-                <input type="hidden" name="selected-target" value="{{ target.id }}"/>
-                <input type="hidden" name="grouping" value="{{ group.id }}"/>
-            </form>
-        </td>
-        
-    </tr>
+        <tr>
+            <td>
+                <form action="{% url 'targets:list' %}" method="GET">
+                    <button type="submit" class="btn btn-link" name="targetlist__name" value="{{ group.id }}"
+                            title="View Group">{{ group.name }}</button>
+                </form>
+            </td>
+            <td valign="middle">{{ group.targets.count }}</td>
+            <td>
+                <form action="{% url 'targets:add-remove-grouping' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" title="Remove Target from Group" class="btn btn-danger" name="remove">Remove
+                    </button>
+                    <input type="hidden" name="selected-target" value="{{ target.id }}"/>
+                    <input type="hidden" name="grouping" value="{{ group.id }}"/>
+                </form>
+            </td>
+
+        </tr>
     {% empty %}
-    <tr>
-        <td>Not in any groups</td>
-        <td></td>
-    </tr>
+        <tr>
+            <td>Not in any groups</td>
+            <td></td>
+        </tr>
     {% endfor %}
     </tbody>
 </table>
 
+
+{% block extra_javascript %}
+<script type="text/javascript">
+    var groupingSelect = document.getElementById('groupingSelect');
+    var queryString = document.getElementById('query_string');
+    groupingSelect.addEventListener('change', function() {
+        var selectedOption = groupingSelect.options[groupingSelect.selectedIndex];
+        queryString.value = 'targetlist__name=' + selectedOption.value;
+    })
+
+</script>
+{% endblock %}
