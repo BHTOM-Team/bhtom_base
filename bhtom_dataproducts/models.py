@@ -97,24 +97,18 @@ def data_product_path(instance, filename):
     :rtype: str
     """
     # Uploads go to MEDIA_ROOT
+    data = 'data'
+
+    if instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry'][0] or \
+            instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry_nondetection'][0]:
+        data = 'photometry'
+    elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['fits_file'][0]:
+        data = 'fits'
+
     if instance.observation_record is not None:
-        return '{0}/{1}/data/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
+        return '{0}/{1}/{2}/{3}'.format(instance.target.name, instance.observation_record.facility, data, filename)
     else:
-        return '{0}/none/data/{1}'.format(instance.target.name, filename)
-
-
-def fits_data_product_path(instance, filename):
-    if instance.observation_record is not None:
-        return '{0}/{1}/fits/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
-    else:
-        return '{0}/none/fits/{1}'.format(instance.target.name, filename)
-
-
-def photometry_data_product_path(instance, filename):
-    if instance.observation_record is not None:
-        return '{0}/{1}/photometry/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
-    else:
-        return '{0}/none/photometry/{1}'.format(instance.target.name, filename)
+        return '{0}/user/1}/{2}'.format(instance.target.name, data, filename)
 
 
 class DataProductGroup(models.Model):
@@ -221,12 +215,13 @@ class DataProduct(models.Model):
         help_text='Data product identifier used by the source of the data product.'
     )
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
-    status = models.CharField(max_length=1, choices=STATUS, default='C', db_index=True)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
+    observatory = models.ForeignKey(ObservatoryMatrix, null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
-    data = models.URLField(null=True, default='')
-    photometry_data = models.FileField(upload_to=photometry_data_product_path, null=True, default=None, db_index=True)
-    fits_data = models.FileField(upload_to=fits_data_product_path, null=True, default=None, db_index=True)
+    data = models.FileField(upload_to=data_product_path, null=True, default='')
+    status = models.CharField(max_length=1, choices=STATUS, default='C')
+    photometry_data = models.URLField(null=True, default=None)
+    fits_data = models.URLField(null=True, default=None)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -235,7 +230,6 @@ class DataProduct(models.Model):
     featured = models.BooleanField(default=False)
     thumbnail = models.FileField(upload_to=data_product_path, null=True, default=None)
     dryRun = models.BooleanField(default=False, verbose_name='Dry Run (no data will be stored in the database)')
-    observatory = models.ForeignKey(ObservatoryMatrix, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ('-created',)
@@ -397,7 +391,6 @@ class ReducedDatum(models.Model):
     """
 
     target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
     data_product = models.ForeignKey(DataProduct, null=True, on_delete=models.CASCADE)
     data_type = models.CharField(
         max_length=100,
@@ -422,6 +415,7 @@ class ReducedDatum(models.Model):
     wavelengths = ArrayField(models.FloatField(), null=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
     active_flg = models.BooleanField(default=True)
+    comment = models.TextField(null=True, blank=True)
 
     class Meta:
         unique_together = (('target', 'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)

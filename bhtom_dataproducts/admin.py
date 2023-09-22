@@ -9,7 +9,7 @@ from bhtom2.settings import BASE_DIR
 from bhtom2.utils.bhtom_logger import BHTOMLogger
 from bhtom_base.bhtom_dataproducts.models import DataProduct, DataProductGroup, ReducedDatum
 
-logger: BHTOMLogger = BHTOMLogger(__name__, '[bhtom_dataprocucts : admin]')
+logger: BHTOMLogger = BHTOMLogger(__name__, 'Bhtom: bhtom_dataprocucts.admin')
 
 
 class ReducedDatumAdmin(admin.ModelAdmin):
