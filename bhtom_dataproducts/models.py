@@ -108,7 +108,7 @@ def data_product_path(instance, filename):
     if instance.observation_record is not None:
         return '{0}/{1}/{2}/{3}'.format(instance.target.name, instance.observation_record.facility, data, filename)
     else:
-        return '{0}/user/1}/{2}'.format(instance.target.name, data, filename)
+        return '{0}/user/{1}/{2}'.format(instance.target.name, data, filename)
 
 
 class DataProductGroup(models.Model):
@@ -220,7 +220,7 @@ class DataProduct(models.Model):
     user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
     data = models.FileField(upload_to=data_product_path, null=True, default='')
     status = models.CharField(max_length=1, choices=STATUS, default='C')
-    photometry_data = models.URLField(null=True, default=None)
+    photometry_data = models.CharField(null=True, default=None)
     fits_data = models.URLField(null=True, default=None)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
