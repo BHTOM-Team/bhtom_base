@@ -220,7 +220,7 @@ class DataProduct(models.Model):
     user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
     data = models.FileField(upload_to=data_product_path, null=True, default='')
     status = models.CharField(max_length=1, choices=STATUS, default='C')
-    photometry_data = models.CharField(null=True, default=None)
+    photometry_data = models.URLField(null=True, default=None)
     fits_data = models.URLField(null=True, default=None)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
