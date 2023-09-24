@@ -230,6 +230,7 @@ class DataProduct(models.Model):
     featured = models.BooleanField(default=False)
     thumbnail = models.FileField(upload_to=data_product_path, null=True, default=None)
     dryRun = models.BooleanField(default=False, verbose_name='Dry Run (no data will be stored in the database)')
+    comment = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ('-created',)
@@ -415,7 +416,6 @@ class ReducedDatum(models.Model):
     wavelengths = ArrayField(models.FloatField(), null=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
     active_flg = models.BooleanField(default=True)
-    comment = models.TextField(null=True, blank=True)
 
     class Meta:
         unique_together = (('target', 'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)
