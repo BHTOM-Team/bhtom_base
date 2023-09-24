@@ -238,7 +238,7 @@ class Target(models.Model):
         help_text='Classification of the object (e.g. variable star, microlensing event)'
     )
     discovery_date = models.DateTimeField(
-        verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH-MM-SS, or leave blank',
+        verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH:MM:SS, or leave blank',
         null=True, blank=True
     )
     mjd_last = models.FloatField(
