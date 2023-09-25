@@ -234,7 +234,7 @@ class Target(models.Model):
     )
 
     classification = models.CharField(
-        max_length=50, null=True, blank=True, verbose_name='classification',
+        max_length=50, null=True, blank=True, verbose_name='classification', choices=settings.CLASSIFICATION_TYPES,
         help_text='Classification of the object (e.g. variable star, microlensing event)'
     )
     discovery_date = models.DateTimeField(
@@ -280,6 +280,12 @@ class Target(models.Model):
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
     filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
+    
+    def get_classification_type_display(self):
+        for key, display in settings.CLASSIFICATION_TYPES:
+            if key == self.classification:
+                return display
+        return "Unknown"  # Default to "Unknown" if not found
 
     @transaction.atomic
     def save(self, *args, **kwargs):
