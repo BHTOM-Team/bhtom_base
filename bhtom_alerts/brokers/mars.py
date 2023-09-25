@@ -19,7 +19,7 @@ MARS_URL = 'https://mars.lco.global'
 filters = {1: 'g', 2: 'r', 3: 'i'}
 
 
-logger: BHTOMLogger = BHTOMLogger(__name__, '[MARS Lightcurve Update]')
+logger: BHTOMLogger = BHTOMLogger(__name__, 'Bhtom:MARS Lightcurve Update')
 
 
 class MARSQueryForm(GenericQueryForm):
