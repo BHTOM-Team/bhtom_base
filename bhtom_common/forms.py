@@ -26,7 +26,7 @@ class CustomUserCreationForm(UserCreationForm):
     """
     Form used for creation of new users and update of existing users.
     """
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(required=True, label='Email*')
     groups = forms.ModelMultipleChoiceField(Group.objects.all().exclude(name='Public'),
                                             required=False, widget=forms.CheckboxSelectMultiple)
 
@@ -34,7 +34,8 @@ class CustomUserCreationForm(UserCreationForm):
                                  help_text="Your name as you want it to appear correctly in potential publications")
     latex_affiliation = forms.CharField(required=True, label='Latex Affiliation*',
                                         help_text="Your affiliation as you want it to appear correctly in potential publications")
-
+    address = forms.CharField(label='Address')
+    about_me = forms.CharField(label='about_me')
 
     class Meta:
         model = User
@@ -55,6 +56,8 @@ class CustomUserCreationForm(UserCreationForm):
             dp.user = user
             dp.latex_name = self.cleaned_data['latex_name']
             dp.latex_affiliation = self.cleaned_data['latex_affiliation']
+            dp.address = self.cleaned_data['address']
+            dp.about_me =self.cleaned_data['about_me']
             dp.save()
         
         return user
