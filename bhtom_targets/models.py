@@ -280,7 +280,8 @@ class Target(models.Model):
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
     filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
-    
+    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True)
+
     def get_classification_type_display(self):
         for key, display in settings.CLASSIFICATION_TYPES:
             if key == self.classification:
