@@ -135,6 +135,9 @@ class Target(models.Model):
     def photometry_plot_path(self, filename):
         return '/photometry/{0}'.format(filename)
 
+    def photometry_icon_plot_path(self, filename):
+        return '/photometryIcon/{0}'.format(filename)
+
     def spectroscopy_plot_path(self, filename):
         return '/spectroscopy/{0}'.format(filename)
 
@@ -276,6 +279,7 @@ class Target(models.Model):
                                   verbose_name='phot class', null=True, blank=True
                                   )
     photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, blank=True, default=None)
+    photometry_icon_plot = models.FileField(upload_to=photometry_icon_plot_path, null=True, blank=True, default=None)
     spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None)
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
     filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
