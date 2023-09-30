@@ -1,1 +1,64 @@
-{{ figure|safe }}
+{% comment %} {{ figure|safe }} {% endcomment %}
+
+<!-- insert this snippet where you want Aladin Lite viewer to appear -->
+<div id="aladin-lite-div" style="width:1200px;height:600px;margin-left:auto;margin-right:auto;"></div>
+<script type="text/javascript" src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js" charset="utf-8"></script>
+<script type="text/javascript">
+    let aladin;
+    A.init.then(() => { //then makes the aladin async
+        //CDS/P/DM/I/355/gaiadr3
+        //CDS/P/Mellinger/color
+        //JAXA/P/CONSTELLATIONS/Image/Lines
+        aladin = A.aladin('#aladin-lite-div', {survey: "CDS/P/Mellinger/color", fov:360, 
+        projection: "AIT", showProjectionControl: true,
+        showCooGrid: false, showCooGridControl: true,
+        expandLayersControl: false});
+
+        var planets = {{ planets|safe}};
+        
+        var circleM = A.circle(planets.moon_ra, planets.moon_dec, 30, {color: 'grey', lineWidth: 1});
+        var overlayM = A.graphicOverlay({name: 'Moon 30 deg',color: 'grey', lineWidth: 1});
+        aladin.addOverlay(overlayM);
+        overlayM.add(circleM)
+        
+        var MoonLayer = A.catalog({name:'MOON',color:'grey',sourceSize:20});
+        aladin.addCatalog(MoonLayer);
+        var MoonMarker = A.marker(planets.moon_ra, planets.moon_dec, {popupTitle: 'MOON'});
+        MoonLayer.addSources(MoonMarker);
+        
+        var circle = A.circle(planets.sun_ra, planets.sun_dec, 45, {color: 'yellow', lineWidth: 1});
+        var overlay = A.graphicOverlay({name: 'Sun 45 deg',color: 'yellow', lineWidth: 1});
+        aladin.addOverlay(overlay);
+        overlay.add(circle)
+        
+        var SunLayer = A.catalog({name:'SUN',color:'yellow',sourceSize:20});
+        aladin.addCatalog(SunLayer);
+        var SunMarker = A.marker(planets.sun_ra, planets.sun_dec, {popupTitle: 'SUN'});
+        SunLayer.addSources(SunMarker);
+        
+        
+        
+        // Get the targets from the Django template context
+        var targets = {{ targets|safe }};
+        
+        // Loop over each target and add it to the Aladin Lite viewer
+        var markers_list = [];
+        for (var i = 0; i < targets.length; i++) {
+            var target = targets[i];
+            //            document.write(target.ra);
+            var marker = A.marker(target.ra, target.dec, 
+            {popupTitle: '<a target="_blank" href="'+target.name+'">'+target.name+'</a>',
+            popupDesc: '<em>Last mag: </em>'+target.last_mag+'<br/><em>'+target.classification+'</em> '
+        });
+        
+        markers_list.push(marker);
+        }
+    
+        var markerLayer = A.catalog({name:'Targets (Sidereal)',color:'blue', sourceSize: 10, lineWidth:1});
+        aladin.addCatalog(markerLayer);
+        markerLayer.addSources(markers_list);
+
+
+        //TODO: add hovering display of the info and clicking leading to the webpage
+    });
+</script> 
