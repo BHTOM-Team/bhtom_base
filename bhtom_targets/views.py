@@ -313,8 +313,8 @@ class TargetUpdateView(Raise403PermissionRequiredMixin, UpdateView):
         super().form_valid(form)
 
         # Update target names for given source
-        for source_name, name in target_names:
-            to_update, created = TargetName.objects.get_or_create(target=self.object, source_name=source_name)
+        for source_name, name, url in target_names:
+            to_update, created = TargetName.objects.get_or_create(target=self.object, source_name=source_name, url=url)
             to_update.name = name
             to_update.save(update_fields=['name'])
             messages.add_message(
