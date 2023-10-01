@@ -47,10 +47,10 @@
     let aladin = A.aladin('#aladin-lite-div', {
       survey: "P/DSS2/color",
       fov: getFovAsDegreesFromForm(),
-      showReticle: false,
+      showReticle: true,
       target: "{{ target.ra }} {{ target.dec }}",
       showGotoControl: false,
-      showZoomControl: false
+      showZoomControl: false,
     });
 
     aladin.on('positionChanged', function() {
