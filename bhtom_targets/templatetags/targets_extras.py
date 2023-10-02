@@ -279,9 +279,9 @@ def target_distribution(targets):
 
     targets_info = []
     for target in targets:
-        classification=target.extra_fields.get('classification')
+        classification=target.classification
         if classification is None: classification='-'
-        last_mag = target.extra_fields.get('mag_last') 
+        last_mag = target.mag_last
         if last_mag is None: last_mag='-'
         ra = target.ra
         dec = target.dec
