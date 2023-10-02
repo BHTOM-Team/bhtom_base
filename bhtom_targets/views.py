@@ -395,7 +395,7 @@ class TargetDeleteView(Raise403PermissionRequiredMixin, DeleteView):
     model = Target
 
 
-class TargetDetailView(Raise403PermissionRequiredMixin, DetailView):
+class TargetDetailView(LoginRequiredMixin, DetailView):
     """
     View that handles the display of the target details. Requires authorization.
     """
