@@ -48,7 +48,7 @@
             //            document.write(target.ra);
             var marker = A.marker(target.ra, target.dec, 
             {popupTitle: '<a target="_blank" href="'+target.name+'">'+target.name+'</a>',
-            popupDesc: '<em>Last mag: </em>'+target.last_mag+'<br/><em>'+target.classification+'</em> '
+            popupDesc: '<em>Last mag: </em>'+target.mag_last+'<br/><em>'+target.classification.toString()+'</em> '
         });
         
         markers_list.push(marker);
@@ -58,7 +58,5 @@
         aladin.addCatalog(markerLayer);
         markerLayer.addSources(markers_list);
 
-
-        //TODO: add hovering display of the info and clicking leading to the webpage
     });
 </script> 
