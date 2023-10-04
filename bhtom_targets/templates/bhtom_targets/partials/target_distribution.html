@@ -48,7 +48,7 @@
             //            document.write(target.ra);
             var marker = A.marker(target.ra, target.dec, 
             {popupTitle: '<a target="_blank" href="'+target.name+'">'+target.name+'</a>',
-            popupDesc: '<em>Last mag: </em>'+target.mag_last+'<br/><em>'+target.classification.toString()+'</em> '
+            popupDesc: '<em>Last mag: </em>'+target.mag_last.toString()+'<br/><em>'+target.classification.toString()+'</em> '
         });
         
         markers_list.push(marker);

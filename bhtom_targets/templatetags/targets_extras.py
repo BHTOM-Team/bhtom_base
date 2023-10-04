@@ -281,12 +281,12 @@ def target_distribution(targets):
     for target in targets:
         classification=target.classification
         if classification is None: classification='-'
-        last_mag = target.mag_last
-        if last_mag is None: last_mag='-'
+        mag_last = target.mag_last
+        if mag_last is None: mag_last='-'
         ra = target.ra
         dec = target.dec
         name = target.name
-        targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'mag_last':last_mag})
+        targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'mag_last':mag_last})
 #    targets_list = list(targets.values('ra', 'dec','name'))  # replace 'field1', 'field2' with actual field names
 #    print(targets_info)
 
