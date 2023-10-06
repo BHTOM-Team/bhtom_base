@@ -36,7 +36,7 @@ class CustomUserCreationForm(UserCreationForm):
                                         help_text="Your affiliation as you want it to appear correctly in potential publications")
     address = forms.CharField(label='Address')
     about_me = forms.CharField(label='About me')
-    orcid_id = forms.CharField(label='ORCID id')
+    orcid_id = forms.CharField(label='ORCID id, more details https://orcid.org/')
 
     class Meta:
         model = User
