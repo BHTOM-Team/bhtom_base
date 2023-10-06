@@ -47,7 +47,9 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'groups')
         field_classes = {'username': UsernameField}
-
+        labels = {
+            'username': 'Username*',
+        }
     def save(self, commit=True):
         user = super(forms.ModelForm, self).save(commit=False)
         # Because this form is used for both create and update user, and the user can be updated without modifying the
