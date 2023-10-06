@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.safestring import mark_safe
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 from django.contrib.auth.models import User, Group
 from bhtom_custom_registration.bhtom_registration.models import LatexUser
@@ -36,7 +37,11 @@ class CustomUserCreationForm(UserCreationForm):
                                         help_text="Your affiliation as you want it to appear correctly in potential publications")
     address = forms.CharField(label='Address')
     about_me = forms.CharField(label='About me')
-    orcid_id = forms.CharField(label='ORCID id, more details https://orcid.org/')
+    orcid_id = forms.CharField(
+        label=mark_safe('ORCID ID, <a href="https://orcid.org/" target="_blank">more details</a>'),
+        widget=forms.TextInput(attrs={'placeholder': 'Enter your ORCID ID'}),
+        required=False  # You can set this to True if the field is required
+    )
 
     class Meta:
         model = User
