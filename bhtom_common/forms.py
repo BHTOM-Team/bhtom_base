@@ -35,7 +35,8 @@ class CustomUserCreationForm(UserCreationForm):
     latex_affiliation = forms.CharField(required=True, label='Latex Affiliation*',
                                         help_text="Your affiliation as you want it to appear correctly in potential publications")
     address = forms.CharField(label='Address')
-    about_me = forms.CharField(label='about_me')
+    about_me = forms.CharField(label='About me')
+    orcid_id = forms.CharField(label='ORCID id')
 
     class Meta:
         model = User
@@ -58,6 +59,7 @@ class CustomUserCreationForm(UserCreationForm):
             dp.latex_affiliation = self.cleaned_data['latex_affiliation']
             dp.address = self.cleaned_data['address']
             dp.about_me =self.cleaned_data['about_me']
+            dp.orcid_id =self.cleaned_data['orcid_id']
             dp.save()
         
         return user
