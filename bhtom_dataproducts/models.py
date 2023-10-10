@@ -392,28 +392,28 @@ class ReducedDatum(models.Model):
     """
 
     target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
-    data_product = models.ForeignKey(DataProduct, null=True, on_delete=models.CASCADE)
+    data_product = models.ForeignKey(DataProduct, null=True, blank=True, on_delete=models.CASCADE)
     data_type = models.CharField(
         max_length=100,
         default=''
     )
     source_name = models.CharField(max_length=100, default='', db_index=True)
-    source_location = models.CharField(max_length=200, default='')
+    source_location = models.CharField(max_length=200,blank=True, default='')
     mjd = models.FloatField(null=False, default=0)
     timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now, db_index=True)
     observer = models.CharField(null=False, max_length=100, default='')
     facility = models.CharField(null=False, max_length=100, default='')
     value = models.FloatField(null=False, default=100)
-    value_list = ArrayField(models.FloatField(), null=True, default=list)
+    value_list = ArrayField(models.FloatField(), null=True, blank=True, default=list)
     value_unit = models.CharField(
         max_length=100,
         choices=ReducedDatumUnit.choices,
         default=ReducedDatumUnit.MAGNITUDE
     )
     error = models.FloatField(null=False, default=1)
-    error_list = ArrayField(models.FloatField(), null=True, default=list)
+    error_list = ArrayField(models.FloatField(), null=True,blank=True, default=list)
     filter = models.CharField(max_length=100, null=False, default='')
-    wavelengths = ArrayField(models.FloatField(), null=True, default=list)
+    wavelengths = ArrayField(models.FloatField(), null=True,blank=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
     active_flg = models.BooleanField(default=True)
 
