@@ -530,10 +530,6 @@ class TargetAddRemoveGroupingView(LoginRequiredMixin, View):
         except Exception as e:
             messages.error(request, 'Cannot find the target group with id={}; {}'.format(grouping_id, e))
             return redirect(reverse('bhtom_base.bhtom_targets:list') + '?' + query_string)
-        if not request.user.has_perm('bhtom_targets.view_targetlist', grouping_object):
-            messages.error(request, 'Permission denied.')
-            return redirect(reverse('bhtom_base.bhtom_targets:list') + '?' + query_string)
-
         if 'add' in request.POST:
             if request.POST.get('isSelectAll') == 'True':
                 add_all_to_grouping(filter_data, grouping_object, request)

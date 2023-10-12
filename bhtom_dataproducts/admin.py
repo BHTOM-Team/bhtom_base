@@ -16,9 +16,8 @@ class ReducedDatumAdmin(admin.ModelAdmin):
     model = ReducedDatum
     list_display = ['target', 'data_product', 'data_type', 'source_name', 'observer', 'facility', 'value', 'value_unit',
                     'active_flg']
-    list_filter = ['facility', 'data_type', 'source_name']
+    list_filter = ['facility', 'data_type', 'source_name', 'target__name','timestamp']
     search_fields = ['mjd', 'observer', 'facility', 'value']
-
     def disable_reducedDatum(self, request, queryset):
         queryset.update(active_flg=False)
         for row in queryset:
