@@ -10,9 +10,9 @@ from django.db.models import CheckConstraint, Q, F
 
 class Proposal(models.Model):
     name = models.CharField(blank=False, max_length=512)
-    facilities = ArrayField(models.TextField(max_length=200), blank=True, default=list())
+    facilities = ArrayField(models.TextField(max_length=200), blank=True, default=list)
     users = models.ManyToManyField(User)
-    parameters = models.JSONField(null=False, blank=True, default='')
+    parameters = models.JSONField(null=False, blank=True, default=dict)
     active_from = models.DateField(null=False)
     active_to = models.DateField(null=False)
     comments = models.CharField(null=True, blank=True, max_length=2048)

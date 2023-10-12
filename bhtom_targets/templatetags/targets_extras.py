@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from astroplan import moon_illumination
 from astropy import units as u
-from astropy.coordinates import Angle, get_body, SkyCoord
+from astropy.coordinates import Angle, get_moon, SkyCoord, get_body
 from astropy.time import Time
 from django import template
 from django.conf import settings
@@ -15,8 +15,6 @@ from plotly import graph_objs as go
 from bhtom_base.bhtom_observations.utils import get_sidereal_visibility
 from bhtom_base.bhtom_targets.models import Target, TargetExtra, TargetList
 from bhtom_base.bhtom_targets.forms import TargetVisibilityForm
-
-from math import atan
 
 register = template.Library()
 
@@ -80,8 +78,10 @@ def target_groups(target):
     Widget displaying groups this target is in and controls for modifying group association for the given target.
     """
     groups = TargetList.objects.filter(targets=target)
+    groupings = TargetList.objects.exclude(targets=target).order_by('id')
     return {'target': target,
-            'groups': groups}
+            'groups': groups,
+            'groupings': groupings}
 
 
 @register.inclusion_tag('bhtom_targets/partials/target_plan.html', takes_context=True)
@@ -227,15 +227,6 @@ def moon_distance(target, day_range=30, width=600, height=400, background=None, 
 #     """
 #     Displays a plot showing on a map the locations of all sidereal targets in the TOM.
 #     """
-#     from astropy.time import Time
-#     jd_now = Time(datetime.utcnow()).jd
-
-#     sun_pos = get_sun(Time(datetime.utcnow()))
-#     alpha_sun, delta_sun = sun_pos.ra.deg, sun_pos.dec.deg
-#     moon_pos = get_moon(Time(datetime.utcnow()))
-#     alpha_moon = moon_pos.ra.deg
-#     delta_moon = moon_pos.dec.deg
-
 #     locations = targets.filter(type=Target.SIDEREAL).values_list('ra', 'dec', 'name')
 #     data = [
 #         dict(
@@ -257,24 +248,6 @@ def moon_distance(target, day_range=30, width=600, height=400, background=None, 
 #             type='scattergeo'
 #         )
 #     ]
-
-#     data.append(
-#         #sun
-#         dict(
-#             lon=[alpha_sun], lat=[delta_sun], text=['SUN'], hoverinfo='text', mode='markers',
-#             marker=dict(size=50, color='yellow', opacity=0.5),
-#             type='scattergeo'
-#         )
-#     )
-#     data.append(
-#         #moon
-#         dict(
-#             lon=[alpha_moon], lat=[delta_moon], text=['Moon'], hoverinfo='text', mode='markers',
-#             marker=dict(size=50, color='grey', opacity=0.5),
-#             type='scattergeo'
-#         )
-#     )
-
 #     layout = {
 #         'title': 'Target Distribution (sidereal)',
 #         'hovermode': 'closest',
@@ -306,14 +279,14 @@ def target_distribution(targets):
 
     targets_info = []
     for target in targets:
-        classification=target.extra_fields.get('classification')
+        classification=target.classification
         if classification is None: classification='-'
-        last_mag = target.extra_fields.get('mag_last') 
-        if last_mag is None: last_mag='-'
+        mag_last = target.mag_last
+        if mag_last is None: mag_last='-'
         ra = target.ra
         dec = target.dec
         name = target.name
-        targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'last_mag':last_mag})
+        targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'mag_last':mag_last})
 #    targets_list = list(targets.values('ra', 'dec','name'))  # replace 'field1', 'field2' with actual field names
 #    print(targets_info)
 
@@ -331,6 +304,7 @@ def target_distribution(targets):
     }
     
     return {'targets': targets_info, 'planets':planets}
+
 
 @register.filter
 def deg_to_sexigesimal(value, fmt):
@@ -398,18 +372,3 @@ def get_item(dictionary, key):
     Custom filter that retrieves the value of a dictionary based on a given key.
     """
     return dictionary.get(key)
-
-# @register.filter
-# def trim_chars(value, start, end):
-#     """
-#     Custom filter to return trimmed string from start index until end index (inclusive)"""
-#     if len(value) > end:
-#         return value[start:end+1]
-#     else:
-#         return value[start:]
-    
-@register.filter
-def trim_chars(value, start):
-    """
-    Custom filter to return trimmed string from start index"""
-    return str(value)[start:]

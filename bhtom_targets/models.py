@@ -132,6 +132,18 @@ class Target(models.Model):
         ('JPL_MAJOR_PLANET', 'JPL Major Planet')
     )
 
+    def photometry_plot_path(self, filename):
+        return '/photometry/{0}'.format(filename)
+
+    def photometry_plot_obs_path(self, filename):
+        return '/photometry/obs_{0}'.format(filename)
+
+    def photometry_icon_plot_path(self, filename):
+        return '/photometryIcon/{0}'.format(filename)
+
+    def spectroscopy_plot_path(self, filename):
+        return '/spectroscopy/{0}'.format(filename)
+
     name = models.CharField(
         max_length=100, default='', verbose_name='Name', help_text='The name of this target e.g. Barnard\'s star.',
         unique=True
@@ -148,10 +160,10 @@ class Target(models.Model):
         help_text='The time which this target was changed in the TOM database.'
     )
     ra = models.FloatField(
-        null=True, blank=True, verbose_name='Right Ascension', help_text='Right Ascension, in degrees.'
+        null=True, blank=True, verbose_name='Right Ascension', help_text='Right Ascension, in degrees.', db_index=True
     )
     dec = models.FloatField(
-        null=True, blank=True, verbose_name='Declination', help_text='Declination, in degrees.'
+        null=True, blank=True, verbose_name='Declination', help_text='Declination, in degrees.', db_index=True
     )
     epoch = models.FloatField(
         null=True, blank=True, verbose_name='Epoch', help_text='Julian Years. Max 2100.'
@@ -227,6 +239,63 @@ class Target(models.Model):
         null=True, blank=True, verbose_name='Perihelion Distance', help_text='AU'
     )
 
+    classification = models.CharField(
+        max_length=50, null=True, blank=True, verbose_name='classification', choices=settings.CLASSIFICATION_TYPES,
+        help_text='Classification of the object (e.g. variable star, microlensing event)'
+    )
+    discovery_date = models.DateTimeField(
+        verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH:MM:SS, or leave blank',
+        null=True, blank=True
+    )
+    mjd_last = models.FloatField(
+        verbose_name='mjd last', null=True, blank=True
+    )
+    mag_last = models.FloatField(
+        verbose_name='mag last', null=True, blank=True
+    )
+    importance = models.FloatField(
+        verbose_name='importance',
+        help_text='Target importance as an integer 0-10 (10 is the highest)',
+        default=0
+    )
+    cadence = models.FloatField(
+        verbose_name='cadence',
+        help_text='Requested cadence (0-100 days)',
+        default=0
+    )
+    priority = models.FloatField(
+        verbose_name='priority', null=True, blank=True
+    )
+    sun_separation = models.FloatField(
+        verbose_name='sun separation', null=True, blank=True
+    )
+    creation_date = models.DateTimeField(
+        verbose_name='creation date', null=True, blank=True
+    )
+    constellation = models.CharField(max_length=50,
+                                     verbose_name='constellation', null=True, blank=True
+                                     )
+    dont_update_me = models.BooleanField(
+        verbose_name='dont update_me', null=True, blank=True
+    )
+    phot_class = models.CharField(max_length=50,
+                                  verbose_name='phot class', null=True, blank=True
+                                  )
+    photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, blank=True, default=None)
+    photometry_plot_obs = models.FileField(upload_to=photometry_plot_obs_path, null=True, blank=True, default=None)
+    photometry_icon_plot = models.FileField(upload_to=photometry_icon_plot_path, null=True, blank=True, default=None)
+    spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None)
+    data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
+    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
+    cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
+    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True)
+
+    def get_classification_type_display(self):
+        for key, display in settings.CLASSIFICATION_TYPES:
+            if key == self.classification:
+                return display
+        return "Unknown"  # Default to "Unknown" if not found
+
     @transaction.atomic
     def save(self, *args, **kwargs):
         """
@@ -252,8 +321,8 @@ class Target(models.Model):
             target_extra.value = v
             target_extra.save()
 
-        if not created:
-            run_hook('target_post_save', target=self, created=created)
+        #if not created:
+            #run_hook('target_post_save', target=self, created=created)
 
     def __str__(self):
         return str(self.name)
@@ -366,6 +435,8 @@ class TargetName(models.Model):
         auto_now=True, verbose_name='Last Modified',
         help_text='The time which this target name was changed in the TOM database.'
     )
+
+    url = models.CharField(max_length=250, null=True, blank=True)
 
     class Meta:
         unique_together = ['source_name', 'target']

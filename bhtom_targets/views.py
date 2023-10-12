@@ -27,6 +27,8 @@ from guardian.shortcuts import get_objects_for_user, get_groups_with_perms, assi
 from django_tables2 import Table
 from django_tables2.views import SingleTableMixin
 
+from bhtom2.bhtom_targets.utils import get_nonempty_names_from_queryset, check_for_existing_alias, \
+    check_duplicate_source_names
 from bhtom2.external_service.data_source_information import PRETTY_SURVEY_NAME, get_pretty_survey_name
 from bhtom_base.bhtom_common.hints import add_hint
 from bhtom_base.bhtom_common.hooks import run_hook
@@ -42,8 +44,7 @@ from bhtom_base.bhtom_targets.groups import (
     move_all_to_grouping, move_selected_to_grouping
 )
 from bhtom_base.bhtom_targets.models import Target, TargetList, TargetName
-from bhtom_base.bhtom_targets.utils import import_targets, export_targets, get_nonempty_names_from_queryset, \
-    check_duplicate_source_names, check_for_existing_alias
+from bhtom_base.bhtom_targets.utils import import_targets, export_targets
 
 logger = logging.getLogger(__name__)
 
@@ -312,8 +313,8 @@ class TargetUpdateView(Raise403PermissionRequiredMixin, UpdateView):
         super().form_valid(form)
 
         # Update target names for given source
-        for source_name, name in target_names:
-            to_update, created = TargetName.objects.get_or_create(target=self.object, source_name=source_name)
+        for source_name, name, url in target_names:
+            to_update, created = TargetName.objects.get_or_create(target=self.object, source_name=source_name, url=url)
             to_update.name = name
             to_update.save(update_fields=['name'])
             messages.add_message(
@@ -394,7 +395,7 @@ class TargetDeleteView(Raise403PermissionRequiredMixin, DeleteView):
     model = Target
 
 
-class TargetDetailView(Raise403PermissionRequiredMixin, DetailView):
+class TargetDetailView(LoginRequiredMixin, DetailView):
     """
     View that handles the display of the target details. Requires authorization.
     """

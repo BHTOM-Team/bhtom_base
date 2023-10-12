@@ -7,20 +7,20 @@
 {% endblock %}
 {% block content %}
 <script>
-// This script maintains the selected tab upon reload
-$(document).ready(function(){
-  // This is required due to the apparent redefinition of $ in another library: https://api.jquery.com/jquery.noconflict/
-  // Based on trial and error, the offending script appears to be JS9, which is used in dataproduct_list_for_target
-  $.noConflict();
-  $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-    localStorage.setItem('activeTab', $(e.target).attr('href'));
-  });
+  // This script maintains the selected tab upon reload
+  $(document).ready(function () {
+    // This is required due to the apparent redefinition of $ in another library: https://api.jquery.com/jquery.noconflict/
+    // Based on trial and error, the offending script appears to be JS9, which is used in dataproduct_list_for_target
+    $.noConflict();
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+      localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
 
-  var activeTab = localStorage.getItem('activeTab');
-  if(activeTab){
-    $('#tabs a[href="' + activeTab + '"]').tab('show');
-  }
-});
+    var activeTab = localStorage.getItem('activeTab');
+    if (activeTab) {
+      $('#tabs a[href="' + activeTab + '"]').tab('show');
+    }
+  });
 </script>
 <div class="row">
   <div class="col-md-4">
@@ -38,7 +38,7 @@ $(document).ready(function(){
       {% if object.type == 'SIDEREAL' %}
       {% aladin object %}
       {% endif %}
-      
+
     </div>
   </div>
   <div class="col-md-8">
@@ -66,26 +66,29 @@ $(document).ready(function(){
       <div class="tab-pane active" id="observe">
         <h4>Observe</h4>
         {% observing_buttons object %}
-        <hr/>
+        <hr />
         {% observationtemplate_run object %}
-        <hr/>
+        <hr />
         <h4>Plan</h4>
         {% if object.type == 'SIDEREAL' %}
-          {% target_plan %}
-          {% moon_distance object %}
+        {% target_plan %}
+        {% moon_distance object %}
         {% elif target.type == 'NON_SIDEREAL' %}
-          <p>Airmass plotting for non-sidereal targets is not currently supported. If you would like to add this functionality, please check out the <a href="https://github.com/TOMToolkit/tom_nonsidereal_airmass" target="_blank">non-sidereal airmass plugin.</a></p>
+        <p>Airmass plotting for non-sidereal targets is not currently supported. If you would like to add this
+          functionality, please check out the <a href="https://github.com/TOMToolkit/tom_nonsidereal_airmass"
+            target="_blank">non-sidereal airmass plugin.</a></p>
         {% endif %}
       </div>
       <div class="tab-pane" id="observations">
         {% existing_observation_form object %}
         <h4>Observations</h4>
-        <a href="{% url 'targets:detail' pk=target.id %}?update_status=True" title="Update status of observations for target" class="btn btn-primary">Update Observations Status</a>
+        <a href="{% url 'targets:detail' pk=target.id %}?update_status=True"
+          title="Update status of observations for target" class="btn btn-primary">Update Observations Status</a>
         {% observation_list object %}
       </div>
       <div class="tab-pane" id="manage-data">
         {% if user.is_authenticated %}
-          {% upload_dataproduct object %}
+        {% upload_dataproduct object %}
         {% endif %}
         {% dataproduct_list_for_target object %}
       </div>
@@ -94,21 +97,21 @@ $(document).ready(function(){
       </div>
       <div class="tab-pane" id="photometry">
         {% photometry_for_target target %}
-        </div>
+      </div>
       <div class="tab-pane" id="spectroscopy">
         {% spectroscopy_for_target target %}
       </div>
 
       {% comments_enabled as comments_are_enabled %}
-      <hr/>
+      <hr />
       <h5>Comments</h5>
-        {% if comments_are_enabled %}
-          {% render_comment_list for object %}
-          {% url 'targets:detail' object.id as next %}
-          {% if user.is_authenticated %}
-            {% render_comment_form for object %}
-          {% endif %}
-        {% endif %}
+      {% if comments_are_enabled %}
+      {% render_comment_list for object %}
+      {% url 'targets:detail' object.id as next %}
+      {% if user.is_authenticated %}
+      {% render_comment_form for object %}
+      {% endif %}
+      {% endif %}
     </div>
   </div>
 </div>

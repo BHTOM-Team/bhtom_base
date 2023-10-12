@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional
 
 from PIL import Image
 from astropy.io import fits
-from astropy.time import Time
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -17,6 +16,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from fits2image.conversions import fits_to_jpg
 
+from bhtom2.bhtom_observatory.models import Observatory, ObservatoryMatrix
 from bhtom_base.bhtom_observations.models import ObservationRecord
 from bhtom_base.bhtom_targets.models import Target
 
@@ -97,10 +97,18 @@ def data_product_path(instance, filename):
     :rtype: str
     """
     # Uploads go to MEDIA_ROOT
+    data = 'data'
+
+    if instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry'][0] or \
+            instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry_nondetection'][0]:
+        data = 'photometry'
+    elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['fits_file'][0]:
+        return 'fits/{0}/{1}'.format(instance.target.name, filename)
+
     if instance.observation_record is not None:
-        return '{0}/{1}/{2}'.format(instance.target.name, instance.observation_record.facility, filename)
+        return 'targets/{0}/{1}/{2}/{3}'.format(instance.target.name, instance.observation_record.facility, data, filename)
     else:
-        return '{0}/none/{1}'.format(instance.target.name, filename)
+        return 'targets/{0}/user/{1}/{2}'.format(instance.target.name, data, filename)
 
 
 class DataProductGroup(models.Model):
@@ -116,15 +124,34 @@ class DataProductGroup(models.Model):
     :param modified: The time at which this object was last changed.
     :type modified: datetime
     """
-    name = models.CharField(max_length=200)
-    created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, unique=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
+    private = models.BooleanField(default=True, db_index=True)
 
     class Meta:
         ordering = ('-created',)
 
     def __str__(self):
         return self.name
+
+
+class DataProductGroup_user(models.Model):
+    """
+    Class representing a group of user in dataproduct group.
+    """
+
+    group = models.ForeignKey(DataProductGroup, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.BooleanField(default=False, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    active_flg = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __str__(self):
+        return self.user.username
 
 
 class DataProduct(models.Model):
@@ -169,6 +196,12 @@ class DataProduct(models.Model):
     :param thumbnail: The thumbnail file associated with this object. Only generated for FITS image files.
     :type thumbnail: FileField
     """
+    STATUS = [
+        ('C', 'TO DO'),
+        ('P', 'IN PROGRESS'),
+        ('S', 'SUCCESS'),
+        ('E', 'ERROR')
+    ]
 
     FITS_EXTENSIONS = {
         '.fits': 'PRIMARY',
@@ -183,14 +216,21 @@ class DataProduct(models.Model):
     )
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     observation_record = models.ForeignKey(ObservationRecord, null=True, default=None, on_delete=models.CASCADE)
-    data = models.FileField(upload_to=data_product_path, null=True, default=None)
+    observatory = models.ForeignKey(ObservatoryMatrix, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
+    data = models.FileField(upload_to=data_product_path, null=True, default='')
+    status = models.CharField(max_length=1, choices=STATUS, default='C')
+    photometry_data = models.URLField(null=True, default=None)
+    fits_data = models.URLField(null=True, default=None)
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
-    data_product_type = models.CharField(max_length=50, blank=True, default='')
+    data_product_type = models.CharField(max_length=50, blank=True, default='', db_index=True)
     featured = models.BooleanField(default=False)
     thumbnail = models.FileField(upload_to=data_product_path, null=True, default=None)
+    dryRun = models.BooleanField(default=False, verbose_name='Dry Run (no data will be stored in the database)')
+    comment = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ('-created',)
@@ -351,34 +391,34 @@ class ReducedDatum(models.Model):
 
     """
 
-    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE, db_index=True)
-    user = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL, db_index=True)
-    data_product = models.ForeignKey(DataProduct, null=True, on_delete=models.CASCADE, db_index=True)
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
+    data_product = models.ForeignKey(DataProduct, null=True, on_delete=models.CASCADE)
     data_type = models.CharField(
         max_length=100,
         default=''
     )
-    source_name = models.CharField(max_length=100, default='')
+    source_name = models.CharField(max_length=100, default='', db_index=True)
     source_location = models.CharField(max_length=200, default='')
-    mjd = models.FloatField(null=False)
+    mjd = models.FloatField(null=False, default=0)
     timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now, db_index=True)
-    observer = models.CharField(null=True, max_length=100, default='')
-    facility = models.CharField(null=True, max_length=100, default='')
-    value = models.FloatField(null=True, default=None)
+    observer = models.CharField(null=False, max_length=100, default='')
+    facility = models.CharField(null=False, max_length=100, default='')
+    value = models.FloatField(null=False, default=100)
     value_list = ArrayField(models.FloatField(), null=True, default=list)
     value_unit = models.CharField(
         max_length=100,
         choices=ReducedDatumUnit.choices,
         default=ReducedDatumUnit.MAGNITUDE
     )
-    error = models.FloatField(null=True, default=None)
+    error = models.FloatField(null=False, default=1)
     error_list = ArrayField(models.FloatField(), null=True, default=list)
-    filter = models.CharField(max_length=100, null=True, default=None)
+    filter = models.CharField(max_length=100, null=False, default='')
     wavelengths = ArrayField(models.FloatField(), null=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
+    active_flg = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = (('target', 'data_type', 'mjd', 'value', 'value_list', 'filter', 'wavelengths'),)
+        unique_together = (('target', 'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)
         get_latest_by = ('mjd',)
 
     def save(self, *args, **kwargs):
@@ -404,3 +444,62 @@ class DatumValue:
     filter: Optional[str] = None
     data_type: Optional[str] = None
     extra_data: Optional[Dict[str, Any]] = None
+
+
+class BrokerCadence(models.Model):
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
+    broker_name = models.CharField(null=False, max_length=50)
+    last_update = models.DateTimeField(null=True, blank=True)
+    insert_row = models.IntegerField(null=True, default=0)
+
+    class Meta:
+        unique_together = (('target', 'broker_name'),)
+
+
+class CCDPhotJob(models.Model):
+    JOB_STATUS_CHOICES = [
+        ('P', 'Preparation'),
+        ('R', 'Running'),
+        ('F', 'Finished'),  # ccdphot finished, result not extracted
+        ('D', 'Done'),  # results sed back
+        ('E', 'Error'),  # ccdphot finished with error
+    ]
+    dataProduct = models.ForeignKey(DataProduct, null=False, on_delete=models.CASCADE)
+    job_id = models.CharField(db_index=True, max_length=50)
+    instrument = models.CharField(max_length=50, blank=True,
+                                  help_text='instrument identification (not used by ccdphot)')
+    instrument_prefix = models.CharField(max_length=50, blank=True,
+                                         help_text='instrument prefix used to chose proper obsinfo')
+    webhook_id = models.CharField(max_length=20, blank=True,
+                                  help_text='id of webhook to be fired after ccdphot processing (not implemented yet)')
+    target_name = models.CharField(max_length=100, blank=True, help_text='name of the target from BHTOM')
+    target_ra = models.FloatField(default=0.0, null=True, help_text='ra in decimal format')
+    target_dec = models.FloatField(default=0.0, null=True, help_text='dec in decimal format')
+    username = models.CharField(max_length=150, blank=True, help_text='BHTOM username')
+    hashtag = models.CharField(max_length=255, blank=True, help_text='CPCS hashtag')
+    dry_run = models.CharField(max_length=5, blank=True, default="False",
+                               help_text='in format of "True" or "False" string')
+    fits_id = models.IntegerField(default=-1, null=True, help_text='ID of the BHTOM fits file')
+    priority = models.IntegerField(default=0, help_text='default = 0, lower number - higher priority')
+    start_time = models.DateTimeField(auto_now_add=True, db_index=True)
+    status_time = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=10, editable=False, choices=JOB_STATUS_CHOICES, default='P')
+    status_message = models.TextField(default='job created', blank=True, editable=False)
+    progress = models.FloatField(default=0.0, editable=False)
+    fits_file = models.FileField(upload_to='fits')
+    ccdphot_result = models.TextField(null=True, blank=True, editable=False)
+    ccdphot_result_file = models.TextField(null=True, blank=True, editable=False)
+    ccdphot_stdout_file = models.TextField(null=True, blank=True, editable=False)
+
+    fits_object = models.CharField(max_length=70, null=True)
+    fits_ra = models.FloatField(default=0.0, null=True)
+    fits_dec = models.FloatField(default=0.0, null=True)
+    fits_mjd = models.FloatField(default=0.0, null=True)
+    fits_hjd = models.FloatField(default=0.0, null=True)
+    fits_exp = models.FloatField(default=0.0, null=True)
+    fits_filter = models.CharField(max_length=70, null=True)
+    fits_origin = models.CharField(max_length=70, null=True)
+    fits_observat = models.CharField(max_length=70, null=True)
+    fits_telescop = models.CharField(max_length=70, null=True)
+    fits_instrume = models.CharField(max_length=70, null=True)
+    fits_observer = models.CharField(max_length=70, null=True)
