@@ -50,6 +50,20 @@ class CustomUserCreationForm(UserCreationForm):
         labels = {
             'username': 'Username*',
         }
+    
+    def __init__(self, *args, **kwargs):
+        try:
+            data = LatexUser.objects.get(user_id=kwargs['instance'].id)
+        except Exception as e:
+            data = None    
+        super().__init__(*args, **kwargs)
+        if data:
+            self.initial['latex_name'] = data.latex_name
+            self.initial['latex_affiliation']= data.latex_affiliation
+            self.initial['address'] = data.address
+            self.initial['about_me'] = data.about_me
+            self.initial['orcid_id'] = data.orcid_id    
+    
     def save(self, commit=True):
         user = super(forms.ModelForm, self).save(commit=False)
         # Because this form is used for both create and update user, and the user can be updated without modifying the
