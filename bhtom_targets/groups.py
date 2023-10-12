@@ -28,9 +28,7 @@ def add_all_to_grouping(filter_data, grouping_object, request):
         return
     for target_object in target_queryset:
         try:
-            if not request.user.has_perm('bhtom_targets.change_target', target_object):
-                failure_targets.append((target_object.name, 'Permission denied.',))
-            elif target_object in grouping_object.targets.all():
+            if target_object in grouping_object.targets.all():
                 warning_targets.append(target_object.name)
             else:
                 grouping_object.targets.add(target_object)
@@ -110,9 +108,7 @@ def remove_all_from_grouping(filter_data, grouping_object, request):
         return
     for target_object in target_queryset:
         try:
-            if not request.user.has_perm('bhtom_targets.change_target', target_object):
-                failure_targets.append((target_object.name, 'Permission denied.',))
-            elif target_object not in grouping_object.targets.all():
+            if target_object not in grouping_object.targets.all():
                 warning_targets.append(target_object.name)
             else:
                 grouping_object.targets.remove(target_object)
@@ -149,9 +145,8 @@ def remove_selected_from_grouping(targets_ids, grouping_object, request):
     for target_id in targets_ids:
         try:
             target_object = Target.objects.get(pk=target_id)
-            if not request.user.has_perm('bhtom_targets.change_target', target_object):
-                failure_targets.append((target_object.name, 'Permission denied.',))
-            elif target_object not in grouping_object.targets.all():
+
+            if target_object not in grouping_object.targets.all():
                 warning_targets.append(target_object.name)
             else:
                 grouping_object.targets.remove(target_object)
@@ -195,9 +190,7 @@ def move_all_to_grouping(filter_data, grouping_object, request):
         return
     for target_object in target_queryset:
         try:
-            if not request.user.has_perm('bhtom_targets.change_target', target_object):
-                failure_targets.append((target_object.name, 'Permission denied.',))
-            elif target_object in grouping_object.targets.all():
+            if target_object in grouping_object.targets.all():
                 warning_targets.append(target_object.name)
             else:
                 target_object.targetlist_set.clear()
@@ -237,9 +230,7 @@ def move_selected_to_grouping(targets_ids, grouping_object, request):
     for target_id in targets_ids:
         try:
             target_object = Target.objects.get(pk=target_id)
-            if not request.user.has_perm('bhtom_targets.change_target', target_object):
-                failure_targets.append((target_object.name, 'Permission denied.',))
-            elif target_object in grouping_object.targets.all():
+            if target_object in grouping_object.targets.all():
                 warning_targets.append(target_object.name)
             else:
                 target_object.targetlist_set.clear()
