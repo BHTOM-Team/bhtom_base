@@ -386,11 +386,11 @@ class TargetUpdateView(Raise403PermissionRequiredMixin, UpdateView):
         return form
 
 
-class TargetDeleteView(Raise403PermissionRequiredMixin, DeleteView):
+class TargetDeleteView(LoginRequiredMixin, DeleteView):
     """
     View for deleting a target. Requires authorization.
     """
-    permission_required = 'bhtom_targets.delete_target'
+
     success_url = reverse_lazy('targets:list')
     model = Target
 
