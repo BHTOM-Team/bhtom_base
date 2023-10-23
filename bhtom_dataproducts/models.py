@@ -466,7 +466,7 @@ class CCDPhotJob(models.Model):
     ]
     dataProduct = models.ForeignKey(DataProduct, null=False, on_delete=models.CASCADE)
     job_id = models.CharField(db_index=True, max_length=50)
-    instrument = models.CharField(max_length=50, blank=True,
+    instrument = models.CharField(max_length=100, blank=True,
                                   help_text='instrument identification (not used by ccdphot)')
     instrument_prefix = models.CharField(max_length=50, blank=True,
                                          help_text='instrument prefix used to chose proper obsinfo')
