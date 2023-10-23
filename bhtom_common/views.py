@@ -142,8 +142,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         form = super().get_form()
         form.fields['password1'].required = False
         form.fields['password2'].required = False
-        if not self.request.user.is_superuser:
-            form.fields.pop('groups')
+
         return form
 
     def dispatch(self, *args, **kwargs):
