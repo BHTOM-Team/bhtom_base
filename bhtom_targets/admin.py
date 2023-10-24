@@ -14,7 +14,7 @@ class TargetExtraInline(admin.TabularInline):
 
 class TargetNameInline(admin.TabularInline):
     model = TargetName
-    list_display = ['source_name', 'name']
+    list_display = ['source_name', 'name', 'url']
 
 
 class TargetAdmin(admin.ModelAdmin):
@@ -29,8 +29,10 @@ class TargetAdmin(admin.ModelAdmin):
         names = TargetNamesFormset(form.data)
         target_names = get_nonempty_names_from_queryset(names.data)
 
-        for broker, name in target_names:
-            run_hook('update_alias', target=obj, broker=broker)
+        for broker, name, url in target_names:
+            to_update, created = TargetName.objects.update_or_create(target=obj, source_name=broker)
+            if to_update.name != name or (to_update.url != url and not (to_update.url is None and url == '')):
+                run_hook('update_alias', target=obj, broker=broker)
 
         super().save_model(request, obj, form, change)
 

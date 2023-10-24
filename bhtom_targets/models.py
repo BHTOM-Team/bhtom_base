@@ -321,8 +321,8 @@ class Target(models.Model):
             target_extra.value = v
             target_extra.save()
 
-        #if not created:
-            #run_hook('target_post_save', target=self, created=created)
+        # if not created:
+        # run_hook('target_post_save', target=self, created=created)
 
     def __str__(self):
         return str(self.name)
@@ -553,3 +553,59 @@ class TargetList(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TargetGaiaDr3(models.Model):
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='dr3')
+    source_id = models.BigIntegerField(null=False, blank=False, unique=True, verbose_name='Source Id', db_index=True)
+    parallax = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax')
+    parallax_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax Error')
+    pmra = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra')
+    pmra_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra Error')
+    pmdec = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec')
+    pmdec_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec Error')
+    ruwe = models.FloatField(null=True, blank=True, unique=False, verbose_name='ruwe')
+    astrometric_excess_noise = models.FloatField(null=True, blank=True, unique=False,
+                                                 verbose_name='Astrometric Excess Noise')
+    r_med_geo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_med_geo')
+    r_lo_geo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_lo_geo')
+    r_hi_geo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_hi_geo')
+    r_med_photogeo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_med_photogeo')
+    r_lo_photogeo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_lo_photogeo')
+    r_hi_photogeo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_hi_photogeo')
+
+    created = models.DateTimeField(
+        auto_now_add=True, help_text='The time which this target name was created.'
+    )
+    modified = models.DateTimeField(
+        auto_now=True, verbose_name='Last Modified',
+        help_text='The time which this target GaiaDr3 was changed in the TOM database.'
+    )
+
+    def __str__(self):
+        return self.target.name
+
+
+class TargetGaiaDr2(models.Model):
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='dr2')
+    source_id = models.BigIntegerField(null=False, blank=False, unique=True, verbose_name='Source Id', db_index=True)
+    parallax = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax')
+    parallax_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax Error')
+    pmra = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra')
+    pmra_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra Error')
+    pmdec = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec')
+    pmdec_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec Error')
+    ruwe = models.FloatField(null=True, blank=True, unique=False, verbose_name='ruwe')
+    astrometric_excess_noise = models.FloatField(null=True, blank=True, unique=False,
+                                                 verbose_name='Astrometric Excess Noise')
+
+    created = models.DateTimeField(
+        auto_now_add=True, help_text='The time which this target name was created.'
+    )
+    modified = models.DateTimeField(
+        auto_now=True, verbose_name='Last Modified',
+        help_text='The time which this target GaiaDr3 was changed in the TOM database.'
+    )
+
+    def __str__(self):
+        return self.target.name
