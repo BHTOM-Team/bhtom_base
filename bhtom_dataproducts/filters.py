@@ -12,4 +12,4 @@ class DataProductFilter(django_filters.FilterSet):
         fields = ['target_name']
 
     def filter_name(self, queryset, name, value):
-        return queryset.filter(Q(target__name__icontains=value) | Q(target__aliases__name__icontains=value))
+        return queryset.filter(Q(target__name__icontains=value))
