@@ -4,8 +4,11 @@ from django.db.models.functions import Cast
 from django.conf import settings
 from django_comments.models import Comment
 from guardian.shortcuts import get_objects_for_user
+from bhtom2.utils.bhtom_logger import BHTOMLogger
 
 register = template.Library()
+logger: BHTOMLogger = BHTOMLogger(__name__, 'Bhtom: bhtom_dataproducts.views')
+
 
 
 @register.inclusion_tag('bhtom_common/partials/navbar_login.html', takes_context=True)
@@ -52,12 +55,22 @@ def recent_comments(context, limit=10):
 
     # In order to filter on ``object_pk`` with an iterable of ``IntegerFields`` using the ``in`` comparator,
     # we have to cast the ``object_pk`` to an int and annotate it as ``object_pk_as_int``.
-    return {
-        'comment_list': Comment.objects.annotate(
+    logger.info("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    logger.info( {'data':{'comment_list': Comment.objects.annotate(
             object_pk_as_int=Cast('object_pk', output_field=IntegerField())
         ).filter(
             object_pk_as_int__in=targets_for_user
-        ).order_by('-submit_date')[:limit]
+        ).order_by('-submit_date')[:limit],
+        'targets': targets_for_user
+        }
+    })
+    return {'data':{'comment_list': Comment.objects.annotate(
+            object_pk_as_int=Cast('object_pk', output_field=IntegerField())
+        ).filter(
+            object_pk_as_int__in=targets_for_user
+        ).order_by('-submit_date')[:limit],
+        'targets': targets_for_user
+        }
     }
 
 

@@ -149,7 +149,7 @@ class Target(models.Model):
         unique=True
     )
     type = models.CharField(
-        max_length=100, choices=TARGET_TYPES, verbose_name='Target Type', help_text='The type of this target.'
+        max_length=100, choices=TARGET_TYPES, verbose_name='Target Type', help_text='The type of this target.', db_index=True
     )
     created = models.DateTimeField(
         auto_now_add=True, verbose_name='Time Created',
@@ -179,10 +179,10 @@ class Target(models.Model):
         help_text='Proper Motion: Dec. Milliarsec/year.'
     )
     galactic_lng = models.FloatField(
-        null=True, blank=True, verbose_name='Galactic Longitude', help_text='Galactic Longitude in degrees.'
+        null=True, blank=True, verbose_name='Galactic Longitude', help_text='Galactic Longitude in degrees.', db_index=True
     )
     galactic_lat = models.FloatField(
-        null=True, blank=True, verbose_name='Galactic Latitude', help_text='Galactic Latitude in degrees.'
+        null=True, blank=True, verbose_name='Galactic Latitude', help_text='Galactic Latitude in degrees.', db_index=True
     )
     distance = models.FloatField(
         null=True, blank=True, verbose_name='Distance', help_text='Parsecs.'
@@ -241,22 +241,23 @@ class Target(models.Model):
 
     classification = models.CharField(
         max_length=50, null=True, blank=True, verbose_name='classification', choices=settings.CLASSIFICATION_TYPES,
-        help_text='Classification of the object (e.g. variable star, microlensing event)'
+        help_text='Classification of the object (e.g. variable star, microlensing event)', db_index=True
     )
     discovery_date = models.DateTimeField(
         verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH:MM:SS, or leave blank',
         null=True, blank=True
     )
     mjd_last = models.FloatField(
-        verbose_name='mjd last', null=True, blank=True
+        verbose_name='mjd last', null=True, default=0, blank=True
     )
     mag_last = models.FloatField(
-        verbose_name='mag last', null=True, blank=True
+        verbose_name='mag last', null=True, blank=True, default=100, db_index=True
     )
     importance = models.FloatField(
         verbose_name='importance',
         help_text='Target importance as an integer 0-10 (10 is the highest)',
-        default=0
+        default=0,
+        db_index=True
     )
     cadence = models.FloatField(
         verbose_name='cadence',
@@ -264,10 +265,10 @@ class Target(models.Model):
         default=0
     )
     priority = models.FloatField(
-        verbose_name='priority', null=True, blank=True
+        verbose_name='priority', null=True, blank=True, default=0, db_index=True
     )
     sun_separation = models.FloatField(
-        verbose_name='sun separation', null=True, blank=True
+        verbose_name='sun separation', null=True, blank=True, db_index=True
     )
     creation_date = models.DateTimeField(
         verbose_name='creation date', null=True, blank=True
@@ -286,9 +287,9 @@ class Target(models.Model):
     photometry_icon_plot = models.FileField(upload_to=photometry_icon_plot_path, null=True, blank=True, default=None)
     spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None)
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
-    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
-    cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
-    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True)
+    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True, default='')
+    cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True, default=0)
+    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True, db_index=True)
 
     def get_classification_type_display(self):
         for key, display in settings.CLASSIFICATION_TYPES:
@@ -321,8 +322,8 @@ class Target(models.Model):
             target_extra.value = v
             target_extra.save()
 
-        #if not created:
-            #run_hook('target_post_save', target=self, created=created)
+        # if not created:
+        # run_hook('target_post_save', target=self, created=created)
 
     def __str__(self):
         return str(self.name)
@@ -553,3 +554,59 @@ class TargetList(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TargetGaiaDr3(models.Model):
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='dr3')
+    source_id = models.BigIntegerField(null=False, blank=False, unique=True, verbose_name='Source Id', db_index=True)
+    parallax = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax')
+    parallax_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax Error')
+    pmra = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra')
+    pmra_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra Error')
+    pmdec = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec')
+    pmdec_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec Error')
+    ruwe = models.FloatField(null=True, blank=True, unique=False, verbose_name='ruwe')
+    astrometric_excess_noise = models.FloatField(null=True, blank=True, unique=False,
+                                                 verbose_name='Astrometric Excess Noise')
+    r_med_geo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_med_geo')
+    r_lo_geo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_lo_geo')
+    r_hi_geo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_hi_geo')
+    r_med_photogeo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_med_photogeo')
+    r_lo_photogeo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_lo_photogeo')
+    r_hi_photogeo = models.FloatField(null=True, blank=True, unique=False, verbose_name='r_hi_photogeo')
+
+    created = models.DateTimeField(
+        auto_now_add=True, help_text='The time which this target name was created.'
+    )
+    modified = models.DateTimeField(
+        auto_now=True, verbose_name='Last Modified',
+        help_text='The time which this target GaiaDr3 was changed in the TOM database.'
+    )
+
+    def __str__(self):
+        return self.target.name
+
+
+class TargetGaiaDr2(models.Model):
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='dr2')
+    source_id = models.BigIntegerField(null=False, blank=False, unique=True, verbose_name='Source Id', db_index=True)
+    parallax = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax')
+    parallax_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax Error')
+    pmra = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra')
+    pmra_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmra Error')
+    pmdec = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec')
+    pmdec_error = models.FloatField(null=True, blank=True, unique=False, verbose_name='pmdec Error')
+    ruwe = models.FloatField(null=True, blank=True, unique=False, verbose_name='ruwe')
+    astrometric_excess_noise = models.FloatField(null=True, blank=True, unique=False,
+                                                 verbose_name='Astrometric Excess Noise')
+
+    created = models.DateTimeField(
+        auto_now_add=True, help_text='The time which this target name was created.'
+    )
+    modified = models.DateTimeField(
+        auto_now=True, verbose_name='Last Modified',
+        help_text='The time which this target GaiaDr3 was changed in the TOM database.'
+    )
+
+    def __str__(self):
+        return self.target.name
