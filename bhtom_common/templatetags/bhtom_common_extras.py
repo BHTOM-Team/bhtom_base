@@ -55,15 +55,6 @@ def recent_comments(context, limit=10):
 
     # In order to filter on ``object_pk`` with an iterable of ``IntegerFields`` using the ``in`` comparator,
     # we have to cast the ``object_pk`` to an int and annotate it as ``object_pk_as_int``.
-    logger.info("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-    logger.info( {'data':{'comment_list': Comment.objects.annotate(
-            object_pk_as_int=Cast('object_pk', output_field=IntegerField())
-        ).filter(
-            object_pk_as_int__in=targets_for_user
-        ).order_by('-submit_date')[:limit],
-        'targets': targets_for_user
-        }
-    })
     return {'data':{'comment_list': Comment.objects.annotate(
             object_pk_as_int=Cast('object_pk', output_field=IntegerField())
         ).filter(
