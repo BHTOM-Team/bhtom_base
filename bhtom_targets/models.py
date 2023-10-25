@@ -248,10 +248,10 @@ class Target(models.Model):
         null=True, blank=True
     )
     mjd_last = models.FloatField(
-        verbose_name='mjd last', null=True, blank=True
+        verbose_name='mjd last', null=True, default=0, blank=True
     )
     mag_last = models.FloatField(
-        verbose_name='mag last', null=True, blank=True, db_index=True
+        verbose_name='mag last', null=True, blank=True, default=100, db_index=True
     )
     importance = models.FloatField(
         verbose_name='importance',
@@ -265,7 +265,7 @@ class Target(models.Model):
         default=0
     )
     priority = models.FloatField(
-        verbose_name='priority', null=True, blank=True, db_index=True
+        verbose_name='priority', null=True, blank=True, default=0, db_index=True
     )
     sun_separation = models.FloatField(
         verbose_name='sun separation', null=True, blank=True, db_index=True
@@ -287,8 +287,8 @@ class Target(models.Model):
     photometry_icon_plot = models.FileField(upload_to=photometry_icon_plot_path, null=True, blank=True, default=None)
     spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None)
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
-    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
-    cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
+    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True, default='')
+    cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True, default=0)
     description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True, db_index=True)
 
     def get_classification_type_display(self):
