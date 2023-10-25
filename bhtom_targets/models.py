@@ -149,7 +149,7 @@ class Target(models.Model):
         unique=True
     )
     type = models.CharField(
-        max_length=100, choices=TARGET_TYPES, verbose_name='Target Type', help_text='The type of this target.'
+        max_length=100, choices=TARGET_TYPES, verbose_name='Target Type', help_text='The type of this target.', db_index=True
     )
     created = models.DateTimeField(
         auto_now_add=True, verbose_name='Time Created',
@@ -179,10 +179,10 @@ class Target(models.Model):
         help_text='Proper Motion: Dec. Milliarsec/year.'
     )
     galactic_lng = models.FloatField(
-        null=True, blank=True, verbose_name='Galactic Longitude', help_text='Galactic Longitude in degrees.'
+        null=True, blank=True, verbose_name='Galactic Longitude', help_text='Galactic Longitude in degrees.', db_index=True
     )
     galactic_lat = models.FloatField(
-        null=True, blank=True, verbose_name='Galactic Latitude', help_text='Galactic Latitude in degrees.'
+        null=True, blank=True, verbose_name='Galactic Latitude', help_text='Galactic Latitude in degrees.', db_index=True
     )
     distance = models.FloatField(
         null=True, blank=True, verbose_name='Distance', help_text='Parsecs.'
@@ -241,7 +241,7 @@ class Target(models.Model):
 
     classification = models.CharField(
         max_length=50, null=True, blank=True, verbose_name='classification', choices=settings.CLASSIFICATION_TYPES,
-        help_text='Classification of the object (e.g. variable star, microlensing event)'
+        help_text='Classification of the object (e.g. variable star, microlensing event)', db_index=True
     )
     discovery_date = models.DateTimeField(
         verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH:MM:SS, or leave blank',
@@ -251,12 +251,13 @@ class Target(models.Model):
         verbose_name='mjd last', null=True, blank=True
     )
     mag_last = models.FloatField(
-        verbose_name='mag last', null=True, blank=True
+        verbose_name='mag last', null=True, blank=True, db_index=True
     )
     importance = models.FloatField(
         verbose_name='importance',
         help_text='Target importance as an integer 0-10 (10 is the highest)',
-        default=0
+        default=0,
+        db_index=True
     )
     cadence = models.FloatField(
         verbose_name='cadence',
@@ -264,10 +265,10 @@ class Target(models.Model):
         default=0
     )
     priority = models.FloatField(
-        verbose_name='priority', null=True, blank=True
+        verbose_name='priority', null=True, blank=True, db_index=True
     )
     sun_separation = models.FloatField(
-        verbose_name='sun separation', null=True, blank=True
+        verbose_name='sun separation', null=True, blank=True, db_index=True
     )
     creation_date = models.DateTimeField(
         verbose_name='creation date', null=True, blank=True
@@ -288,7 +289,7 @@ class Target(models.Model):
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
     filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True)
-    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True)
+    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True, db_index=True)
 
     def get_classification_type_display(self):
         for key, display in settings.CLASSIFICATION_TYPES:
