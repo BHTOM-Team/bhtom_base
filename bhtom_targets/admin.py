@@ -35,7 +35,7 @@ class TargetAdmin(admin.ModelAdmin):
                 run_hook('update_alias', target=obj, broker=broker)
 
         super().save_model(request, obj, form, change)
-
+        run_hook('update_priority', target=obj)
 
 class TargetListAdmin(admin.ModelAdmin):
     model = TargetList
