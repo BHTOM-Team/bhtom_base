@@ -465,7 +465,7 @@ class CCDPhotJob(models.Model):
         ('E', 'Error'),  # ccdphot finished with error
     ]
     dataProduct = models.ForeignKey(DataProduct, null=False, on_delete=models.CASCADE)
-    job_id = models.CharField(db_index=True, max_length=50)
+    job_id = models.CharField(db_index=True, unique=True, max_length=50)
     instrument = models.CharField(max_length=100, blank=True,
                                   help_text='instrument identification (not used by ccdphot)')
     instrument_prefix = models.CharField(max_length=50, blank=True,
@@ -503,3 +503,8 @@ class CCDPhotJob(models.Model):
     fits_telescop = models.CharField(max_length=70, null=True)
     fits_instrume = models.CharField(max_length=70, null=True)
     fits_observer = models.CharField(max_length=70, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['job_id'], name='unique_job_id')
+        ]
