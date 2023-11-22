@@ -1,8 +1,8 @@
+{% load static %}
 {% comment %} {{ figure|safe }} {% endcomment %}
-
 <!-- insert this snippet where you want Aladin Lite viewer to appear -->
 <div id="aladin-lite-div" style="width:1200px;height:600px;margin-left:auto;margin-right:auto;"></div>
-<script type="text/javascript" src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'aladin/js/aladin.js' %}" charset="utf-8"></script>
 <script type="text/javascript">
     let aladin;
     A.init.then(() => { //then makes the aladin async
