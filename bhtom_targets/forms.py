@@ -116,6 +116,7 @@ class SiderealTargetCreateForm(TargetForm):
         super().__init__(*args, **kwargs)
         for field in REQUIRED_SIDEREAL_FIELDS:
             self.fields[field].required = True
+        self.fields['type'].initial = Target.SIDEREAL    
 
     class Meta(TargetForm.Meta):
         fields = SIDEREAL_FIELDS
@@ -126,6 +127,7 @@ class NonSiderealTargetCreateForm(TargetForm):
         super().__init__(*args, **kwargs)
         for field in REQUIRED_NON_SIDEREAL_FIELDS:
             self.fields[field].required = True
+        self.fields['type'].initial = Target.NON_SIDEREAL    
 
     def clean(self):
         """
