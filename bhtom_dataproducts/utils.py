@@ -1,5 +1,4 @@
 import os
-import re
 from django.core.files import File
 
 from .models import DataProduct
@@ -34,10 +33,3 @@ def create_image_dataproduct(data_product):
     return
 
 
-
-def sanitize_folder_name(folder_name):
-    folder_name = re.sub(r'[^a-zA-Z0-9_\-]', '', folder_name)
-
-    folder_name = folder_name.replace(' ', '_')
-
-    return folder_name
