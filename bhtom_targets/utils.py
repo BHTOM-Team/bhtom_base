@@ -29,9 +29,8 @@ def export_targets(qs):
     # Gets the count of the target names for the target with the most aliases in the database
     # This is to construct enough row headers of format "name2, name3, name4, etc" for exporting aliases
     # The alias headers are then added to the set of fields for export
-    all_fields = target_fields + target_extra_fields + [f'{sn["source_name"].upper()}_name'
-                                                        for sn in
-                                                        TargetName.objects.filter(target__in=qs_pk).values('source_name')]
+    all_fields = target_fields + target_extra_fields + [f'{sn.upper()}_name' for sn in
+                                                     set(TargetName.objects.filter(target__in=qs_pk).values_list('source_name', flat=True))]
     for key in ['id', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra']:
         all_fields.remove(key)
 

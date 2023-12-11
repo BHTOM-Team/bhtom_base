@@ -4,6 +4,7 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Optional
+import re
 
 from PIL import Image
 from astropy.io import fits
@@ -81,7 +82,6 @@ def is_fits_image_file(file):
                 return True
     return False
 
-
 def data_product_path(instance, filename):
     """
     Returns the TOM-style path for a ``DataProduct`` file. Structure is <target identifier>/<facility>/<filename>.
@@ -103,13 +103,21 @@ def data_product_path(instance, filename):
             instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry_nondetection'][0]:
         data = 'photometry'
     elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['fits_file'][0]:
-        return 'fits/{0}/{1}'.format(instance.target.name, filename)
+        return 'fits/{0}/{1}'.format(sanitize_folder_name(instance.target.name), filename)
 
     if instance.observation_record is not None:
-        return 'targets/{0}/{1}/{2}/{3}'.format(instance.target.name, instance.observation_record.facility, data, filename)
+        return 'targets/{0}/{1}/{2}/{3}'.format(
+            sanitize_folder_name(instance.target.name),
+            instance.observation_record.facility,
+            data,
+            filename
+        )
     else:
-        return 'targets/{0}/user/{1}/{2}'.format(instance.target.name, data, filename)
-
+        return 'targets/{0}/user/{1}/{2}'.format(
+            sanitize_folder_name(instance.target.name),
+            data,
+            filename
+        )
 
 class DataProductGroup(models.Model):
     """
