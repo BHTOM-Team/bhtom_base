@@ -4,7 +4,6 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Optional
-import re
 
 from PIL import Image
 from astropy.io import fits
@@ -20,7 +19,7 @@ from fits2image.conversions import fits_to_jpg
 from bhtom2.bhtom_observatory.models import Observatory, ObservatoryMatrix
 from bhtom_base.bhtom_observations.models import ObservationRecord
 from bhtom_base.bhtom_targets.models import Target
-
+from bhtom_base.bhtom_dataproducts.utils import sanitize_folder_name
 logger = logging.getLogger(__name__)
 
 try:
