@@ -19,7 +19,8 @@ from fits2image.conversions import fits_to_jpg
 from bhtom2.bhtom_observatory.models import Observatory, ObservatoryMatrix
 from bhtom_base.bhtom_observations.models import ObservationRecord
 from bhtom_base.bhtom_targets.models import Target
-from bhtom_base.bhtom_dataproducts.utils import sanitize_folder_name
+import re
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -80,6 +81,10 @@ def is_fits_image_file(file):
             if hdu.header.get('EXTNAME') == 'SCI':
                 return True
     return False
+
+def sanitize_folder_name(name):
+    # Replace special characters with underscores
+    return re.sub(r'[^a-zA-Z0-9_]', '_', name)
 
 def data_product_path(instance, filename):
     """
