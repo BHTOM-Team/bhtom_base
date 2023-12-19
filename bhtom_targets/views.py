@@ -46,6 +46,7 @@ from bhtom_base.bhtom_targets.groups import (
 from bhtom_base.bhtom_targets.models import Target, TargetList, TargetName
 from bhtom_base.bhtom_targets.utils import import_targets, export_targets
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -493,15 +494,17 @@ class TargetExportView(TargetListView):
     def render_to_response(self, context, **response_kwargs):
         """
         Returns a response containing the exported CSV of selected targets.
-
-        :param context: Context object for this view
-        :type context: dict
-
-        :returns: response class with CSV
-        :rtype: StreamingHttpResponse
         """
-        qs = context['filter'].qs.values()
-        file_buffer = export_targets(qs)
+        target_ids_str = self.request.GET.get('selected_targets', '')
+        target_ids = target_ids_str.split(',')
+        target_ids = [int(target_id) for target_id in target_ids if target_id.isdigit()]
+
+        try:
+            targets = Target.objects.filter(id__in=target_ids)
+        except Exception:
+            pass
+        
+        file_buffer = export_targets(targets)
         file_buffer.seek(0)  # goto the beginning of the buffer
         response = StreamingHttpResponse(file_buffer, content_type="text/csv")
         filename = "targets-{}.csv".format(slugify(datetime.utcnow()))

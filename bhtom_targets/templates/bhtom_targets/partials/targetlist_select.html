@@ -42,4 +42,17 @@
         document.getElementById("displaySelected").innerHTML = "All " + totalTargets + " Targets Selected";
         document.getElementById("optionSelectAll").innerHTML = "";
     }
+
+    function export_selected_targets() {
+        var selectedTargets = [];
+        checkboxes = document.getElementsByName("selected-target");
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            if (checkboxes[i].checked) {
+                selectedTargets.push(checkboxes[i].value);
+            }
+        }
+        var url = "{% url 'targets:export' %}?selected_targets=" + selectedTargets;
+
+        window.location.href = url;
+    }
 </script>
