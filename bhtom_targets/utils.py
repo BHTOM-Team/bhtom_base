@@ -30,7 +30,7 @@ def export_targets(qs):
     
     all_fields = target_fields + target_extra_fields + [f'{sn.upper()}_name' for sn in
                                                      set(TargetName.objects.filter(target__in=qs_pk).values_list('source_name', flat=True))]
-    for key in ['id', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra']:
+    for key in ['id','brokercadence','dr3','dr2', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra', 'photometry_plot', 'photometry_plot_obs', 'photometry_icon_plot', 'spectroscopy_plot', 'data_plot', 'modified','created']:
         all_fields.remove(key)
 
     file_buffer = StringIO()
@@ -50,7 +50,7 @@ def export_targets(qs):
             target_dict[f'{name.source_name.upper()}_name'] = name.name
 
         # Remove unnecessary fields
-        for key in ['id', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra']:
+        for key in ['id','brokercadence','dr3','dr2', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra', 'photometry_plot', 'photometry_plot_obs', 'photometry_icon_plot', 'spectroscopy_plot', 'data_plot', 'modified','created']:
             if key in target_dict:
                 del target_dict[key]
         writer.writerow(target_dict)
