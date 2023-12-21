@@ -7,6 +7,7 @@ from django.db.models.functions.math import ACos, Cos, Radians, Pi, Sin
 from django.conf import settings
 from math import radians
 from bhtom_base.bhtom_common.hooks import run_hook
+from django.forms.models import model_to_dict
 
 
 # NOTE: This saves locally. To avoid this, create file buffer.
@@ -22,32 +23,39 @@ def export_targets(qs):
     :returns: String buffer of exported targets
     :rtype: StringIO
     """
-    qs_pk = [data['id'] for data in qs]
+    qs_pk = [data.id for data in qs]
     data_list = list(qs)
     target_fields = [field.name for field in Target._meta.get_fields()]
     target_extra_fields = list({field.key for field in TargetExtra.objects.filter(target__in=qs_pk)})
-    # Gets the count of the target names for the target with the most aliases in the database
-    # This is to construct enough row headers of format "name2, name3, name4, etc" for exporting aliases
-    # The alias headers are then added to the set of fields for export
+    
     all_fields = target_fields + target_extra_fields + [f'{sn.upper()}_name' for sn in
                                                      set(TargetName.objects.filter(target__in=qs_pk).values_list('source_name', flat=True))]
-    for key in ['id', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra']:
+    for key in ['id','brokercadence','dr3','dr2', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra', 'photometry_plot', 'photometry_plot_obs', 'photometry_icon_plot', 'spectroscopy_plot', 'data_plot', 'modified','created']:
         all_fields.remove(key)
 
     file_buffer = StringIO()
     writer = csv.DictWriter(file_buffer, fieldnames=all_fields)
     writer.writeheader()
+    
     for target_data in data_list:
-        extras = list(TargetExtra.objects.filter(target_id=target_data['id']))
-        names = list(TargetName.objects.filter(target_id=target_data['id']))
-        for e in extras:
-            target_data[e.key] = e.value
-        for name in names:
-            target_data[f'{name.source_name.upper()}_name'] = name.name
-        del target_data['id']  # do not export 'id'
-        writer.writerow(target_data)
-    return file_buffer
+        # Convert the Target object to a dictionary
+        target_dict = model_to_dict(target_data, fields=target_fields)
 
+        # Add extra fields from TargetExtra
+        for e in TargetExtra.objects.filter(target_id=target_data.id):
+            target_dict[e.key] = e.value
+        
+        # Add name fields from TargetName
+        for name in TargetName.objects.filter(target_id=target_data.id):
+            target_dict[f'{name.source_name.upper()}_name'] = name.name
+
+        # Remove unnecessary fields
+        for key in ['id','brokercadence','dr3','dr2', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra', 'photometry_plot', 'photometry_plot_obs', 'photometry_icon_plot', 'spectroscopy_plot', 'data_plot', 'modified','created']:
+            if key in target_dict:
+                del target_dict[key]
+        writer.writerow(target_dict)
+
+    return file_buffer
 
 def import_targets(targets):
     """
