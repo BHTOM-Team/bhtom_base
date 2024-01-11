@@ -82,9 +82,11 @@ def is_fits_image_file(file):
                 return True
     return False
 
+
 def sanitize_folder_name(name):
     # Replace special characters with underscores
     return re.sub(r'[^a-zA-Z0-9_]', '_', name)
+
 
 def data_product_path(instance, filename):
     """
@@ -122,6 +124,7 @@ def data_product_path(instance, filename):
             data,
             filename
         )
+
 
 class DataProductGroup(models.Model):
     """
@@ -227,20 +230,21 @@ class DataProduct(models.Model):
         help_text='Data product identifier used by the source of the data product.'
     )
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
-    observation_record = models.ForeignKey(ObservationRecord, null=True,blank=True, default=None, on_delete=models.CASCADE)
-    observatory = models.ForeignKey(ObservatoryMatrix, null=True,blank=True, on_delete=models.SET_NULL)
-    user = models.ForeignKey(User, null=True,blank=True, default=None, on_delete=models.SET_NULL)
-    data = models.FileField(upload_to=data_product_path, null=True,blank=True, default='')
+    observation_record = models.ForeignKey(ObservationRecord, null=True, blank=True, default=None,
+                                           on_delete=models.CASCADE)
+    observatory = models.ForeignKey(ObservatoryMatrix, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    data = models.FileField(upload_to=data_product_path, null=True, blank=True, default='')
     status = models.CharField(max_length=1, choices=STATUS, default='C')
-    photometry_data = models.URLField(null=True, blank=True,default=None)
-    fits_data = models.URLField(null=True, blank=True,default=None)
+    photometry_data = models.URLField(null=True, blank=True, default=None)
+    fits_data = models.URLField(null=True, blank=True, default=None)
     extra_data = models.TextField(blank=True, default='')
-    group = models.ManyToManyField(DataProductGroup,blank=True)
+    group = models.ManyToManyField(DataProductGroup, blank=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
     data_product_type = models.CharField(max_length=50, blank=True, default='', db_index=True)
     featured = models.BooleanField(default=False)
-    thumbnail = models.FileField(upload_to=data_product_path, null=True, blank=True,default=None)
+    thumbnail = models.FileField(upload_to=data_product_path, null=True, blank=True, default=None)
     dryRun = models.BooleanField(default=False, verbose_name='Dry Run (no data will be stored in the database)')
     comment = models.TextField(null=True, blank=True)
 
@@ -410,7 +414,7 @@ class ReducedDatum(models.Model):
         default=''
     )
     source_name = models.CharField(max_length=100, default='', db_index=True)
-    source_location = models.CharField(max_length=200,blank=True, default='')
+    source_location = models.CharField(max_length=200, blank=True, default='')
     mjd = models.FloatField(null=False, default=0)
     timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now, db_index=True)
     observer = models.CharField(null=False, max_length=100, default='')
@@ -423,9 +427,9 @@ class ReducedDatum(models.Model):
         default=ReducedDatumUnit.MAGNITUDE
     )
     error = models.FloatField(null=False, default=1)
-    error_list = ArrayField(models.FloatField(), null=True,blank=True, default=list)
+    error_list = ArrayField(models.FloatField(), null=True, blank=True, default=list)
     filter = models.CharField(max_length=100, null=False, default='')
-    wavelengths = ArrayField(models.FloatField(), null=True,blank=True, default=list)
+    wavelengths = ArrayField(models.FloatField(), null=True, blank=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
     active_flg = models.BooleanField(default=True)
 
@@ -466,6 +470,34 @@ class BrokerCadence(models.Model):
 
     class Meta:
         unique_together = (('target', 'broker_name'),)
+
+
+class AtlasQueue(models.Model):
+    STATUS = [
+        ('C', 'CREATED'),
+        ('P', 'IN PROGRESS'),
+        ('S', 'SUCCESS'),
+        ('E', 'ERROR'),
+        ('T', 'THROTTLED')
+    ]
+
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
+    task_url = models.URLField(null=True, blank=True, default=None)
+    result_url = models.URLField(null=True, blank=True, default=None, db_index=True)
+    mjd_min = models.FloatField(null=False, default=0)
+    create_task = models.DateTimeField(auto_now_add=True, db_index=True)
+    last_update = models.DateTimeField(null=True, blank=True)
+    insert_row = models.IntegerField(null=True, default=0)
+    status = models.CharField(max_length=1, choices=STATUS, default='C')
+
+    class Meta:
+        unique_together = (('target', 'task_url'),)
+
+
+class AtlasBlock(models.Model):
+    atlas_queue = models.ForeignKey(AtlasQueue, null=False, on_delete=models.CASCADE)
+    end_block = models.DateTimeField(null=True, blank=True, db_index=True)
+    wait_time = models.FloatField(null=True, blank=True, default=None)
 
 
 class CCDPhotJob(models.Model):
