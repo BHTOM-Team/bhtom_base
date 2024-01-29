@@ -72,7 +72,7 @@ class CustomUserCreationForm(UserCreationForm):
                                         help_text="Your affiliation as you want it to appear correctly in potential publications")
 
     address = forms.CharField(required=False, label='Address', max_length=150)
-    about_me = forms.CharField(required=False, label='About me', max_length=150)
+    about_me = forms.CharField(required=True, label='About me*', max_length=150)
 
     orcid_id = forms.CharField(
         label=mark_safe('ORCID ID, <a href="https://orcid.org/" target="_blank">more details</a>'),
