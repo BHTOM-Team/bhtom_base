@@ -21,7 +21,6 @@ DEFAULT_ALERT_CLASSES = [
     'bhtom_base.bhtom_alerts.brokers.scout.ScoutBroker',
     'bhtom_base.bhtom_alerts.brokers.alerce.ALeRCEBroker',
     'bhtom_base.bhtom_alerts.brokers.antares.ANTARESBroker',
-    'bhtom_base.bhtom_alerts.brokers.gaia.GaiaBroker',
     'bhtom_base.bhtom_alerts.brokers.scimma.SCIMMABroker',
     'bhtom_base.bhtom_alerts.brokers.fink.FinkBroker',
 ]
