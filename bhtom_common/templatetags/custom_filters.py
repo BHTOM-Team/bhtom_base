@@ -21,3 +21,9 @@ def split_text(value, max_length=40):
     return "\n".join(result)
 
 register.filter('split_text', split_text)
+
+
+def reverse_list(value):
+    return reversed(value)
+
+register.filter('reverse', reverse_list)
