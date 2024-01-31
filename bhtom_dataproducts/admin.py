@@ -34,7 +34,7 @@ def updatePlot(targetName):
     try:
         guid = get_guid()
         requests.post(secret.get('CPCS_URL') + '/updatePlot/', json={'name': targetName},
-                      headers={"correlation_id": guid})
+                      headers={"Correlation-ID": guid})
         logger.debug("Update Plot for: %s successfully" % str(targetName))
 
     except Exception as e:
