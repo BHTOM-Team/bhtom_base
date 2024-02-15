@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from bhtom_base.bhtom_common.hooks import run_hook
 
-GLOBAL_TARGET_FIELDS = ['name', 'type']
+GLOBAL_TARGET_FIELDS = ['name']
 
 SIDEREAL_FIELDS = GLOBAL_TARGET_FIELDS + [
     'ra', 'dec', 'epoch', 'pm_ra', 'pm_dec', 'galactic_lng', 'galactic_lat', 'distance', 'distance_err'
