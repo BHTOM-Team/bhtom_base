@@ -37,7 +37,52 @@
         }
     }
 
+    function check_all_checkboxes() {
+        var selectedTargets = [];
+        var checkboxes = document.getElementsByName("selected-target");
+        var currentPageIndex = parseInt(document.querySelector('.paginate_button.current').innerText);
+
+        // Check all checkboxes on the current page
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = true;
+            selectedTargets.push(checkboxes[i].value);
+        }
+    
+        // Check if there's a "Next" button
+        var nextButton = document.getElementById('DataTables_Table_0_next');
+        var hasNextPage = nextButton !== null;
+    
+        // While there's a next page, go to the next page and check all checkboxes
+        while (hasNextPage && !nextButton.classList.contains('disabled')) {
+            nextButton.click(); 
+        
+            checkboxes = document.getElementsByName("selected-target");
+            for (var j = 0; j < checkboxes.length; j++) {
+                checkboxes[j].checked = true;
+                selectedTargets.push(checkboxes[j].value); 
+            }
+            // Check if there's another "Next" button
+            nextButton = document.getElementById('DataTables_Table_0_next');
+            hasNextPage = nextButton !== null;
+        }
+        
+        var previousButton = document.getElementById('DataTables_Table_0_previous');
+        while (previousButton !== null && !previousButton.classList.contains('disabled') ) {
+            previousButton.click(); 
+            checkboxes = document.getElementsByName("selected-target"); 
+            for (var k = 0; k < checkboxes.length; k++) {
+                if (!selectedTargets.includes(checkboxes[k].value)) {
+                    checkboxes[k].checked = true;
+                    selectedTargets.push(checkboxes[k].value); 
+                }
+            }
+            previousButton = document.getElementById('DataTables_Table_0_previous');
+        }  
+        count_selected();
+    }
+    
     function select_all(totalTargets) {
+        check_all_checkboxes();
         document.getElementById("isSelectAll").value = "True";
         document.getElementById("displaySelected").innerHTML = "All " + totalTargets + " Targets Selected";
         document.getElementById("optionSelectAll").innerHTML = "";
@@ -51,8 +96,38 @@
                 selectedTargets.push(checkboxes[i].value);
             }
         }
+    
+        var nextButton = document.getElementById('DataTables_Table_0_next');
+        var hasNextPage = nextButton !== null;
+    
+        while (hasNextPage && !nextButton.classList.contains('disabled')) {
+            nextButton.click(); 
+        
+            checkboxes = document.getElementsByName("selected-target");
+            for (var j = 0; j < checkboxes.length; j++) {
+                if(checkboxes[j].checked);
+                selectedTargets.push(checkboxes[j].value); 
+            }
+            nextButton = document.getElementById('DataTables_Table_0_next');
+            hasNextPage = nextButton !== null;
+        }
+        
+        var previousButton = document.getElementById('DataTables_Table_0_previous');
+        while (previousButton !== null && !previousButton.classList.contains('disabled') ) {
+            previousButton.click(); 
+            checkboxes = document.getElementsByName("selected-target"); 
+            for (var k = 0; k < checkboxes.length; k++) {
+                if (!selectedTargets.includes(checkboxes[k].value)) {
+                    if(checkboxes[k].checked){
+                        selectedTargets.push(checkboxes[k].value);
+                    } 
+                }
+            }
+            previousButton = document.getElementById('DataTables_Table_0_previous');
+        }  
+    
         var url = "{% url 'targets:export' %}?selected_targets=" + selectedTargets;
-
+    
         window.location.href = url;
     }
 </script>
