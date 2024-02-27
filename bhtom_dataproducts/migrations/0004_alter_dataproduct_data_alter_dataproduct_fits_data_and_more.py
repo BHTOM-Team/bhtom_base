@@ -9,7 +9,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bhtom_observatory', '0001_initial'),
         ('bhtom_observations', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('bhtom_dataproducts', '0003_alter_ccdphotjob_instrument'),
