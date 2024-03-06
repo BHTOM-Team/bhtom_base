@@ -460,6 +460,8 @@ class DatumValue:
     filter: Optional[str] = None
     data_type: Optional[str] = None
     extra_data: Optional[Dict[str, Any]] = None
+    flux_units: Optional[str] = None
+    wavelength_units: Optional[str] = None
 
 
 class BrokerCadence(models.Model):
@@ -552,3 +554,24 @@ class CCDPhotJob(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['job_id'], name='unique_job_id')
         ]
+
+
+class SpectroscopyDatum(models.Model):
+    target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
+    data_product = models.ForeignKey(DataProduct, null=True, blank=True, on_delete=models.CASCADE)
+    source_name = models.CharField(max_length=100, default='')
+    source_location = models.CharField(max_length=200, blank=True, default='')
+    mjd = models.FloatField(null=False, default=0)
+    timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now)
+    observer = models.CharField(null=False, max_length=100, default='')
+    facility = models.CharField(null=False, max_length=100, default='')
+    flux = ArrayField(models.FloatField(null=False, blank=False), null=False, blank=False)
+    flux_units = models.CharField(null=False, blank=False, max_length=50, default='erg/(Angstrom s cm2)')
+    wavelength = ArrayField(models.FloatField(null=False, blank=False), null=False, blank=False)
+    wavelength_units = models.CharField(null=False,blank=False, max_length=50, default='Angstrom')
+    active_flg = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = (('target', 'mjd', 'facility', 'observer'),)
+        get_latest_by = ('mjd',)
+
