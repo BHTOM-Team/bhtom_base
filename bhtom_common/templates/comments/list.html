@@ -22,7 +22,7 @@
           class="btn btn-sm btn-danger float-right">✖</a>
         {% endif %}
       </small>
-      <p class="mr-1">{{ comment.comment|split_text|truncatewords:30 }}</p>
+      <p class="mr-1">{{ comment.comment|split_text }}</p>
     </div>
   </li>
   {% empty %}
@@ -47,7 +47,7 @@
           class="btn btn-sm btn-danger float-right">✖</a>
         {% endif %}
       </small>
-      <p class="mr-1">{{ comment.comment|truncatewords:30 }}</p>
+      <p class="mr-1">{{ comment.comment }}</p>
     </div>
   </li>
   {% empty %}
