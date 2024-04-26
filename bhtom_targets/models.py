@@ -42,7 +42,6 @@ class CleanData(models.Model):
         super().clean()
 
         char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField))]
-        file_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.FileField, models.URLField))]
 
         for value in char_fields:
             field_value = getattr(self, value.name)
@@ -51,11 +50,6 @@ class CleanData(models.Model):
                 if field_value != cleaned_name:
                     raise ValidationError("Invalid data format.")
 
-        for value in file_fields:
-            file_name = str(value)
-            cleaned_name = bleach.clean(file_name, tags=[], attributes={}, protocols=[], strip=True)
-            if file_name != cleaned_name:
-                raise ValidationError("Invalid file name.")
 
 class Target(CleanData):
     """
