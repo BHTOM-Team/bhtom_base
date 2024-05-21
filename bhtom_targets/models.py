@@ -43,11 +43,13 @@ class CleanData(models.Model):
 
         char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField))]
 
-        for value in char_fields:
-            field_value = getattr(self, value.name)
+        for char_field in char_fields:
+            field_value = getattr(self, char_field.name)
             if field_value is not None:
-                cleaned_name = bleach.clean(field_value, tags=[], attributes={}, protocols=[], strip=True)
-                if field_value != cleaned_name:
+                value = field_value.replace('\r', '')
+                cleaned_name = bleach.clean(value, tags=[], attributes={}, protocols=[], strip=True)
+                if value != cleaned_name:
+
                     raise ValidationError("Invalid data format.")
 
 
