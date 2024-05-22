@@ -461,7 +461,6 @@ class ReducedDatum(CleanData):
     wavelengths = ArrayField(models.FloatField(), null=True, blank=True, default=list)
     extra_data = models.JSONField(null=True, blank=True)
     active_flg = models.BooleanField(default=True)
-    match_distans = models.FloatField(default=0.5)
 
     class Meta:
         unique_together = (('target', 'mjd', 'value', 'error', 'filter', 'facility', 'observer'),)
@@ -579,6 +578,7 @@ class CCDPhotJob(CleanData):
     fits_telescop = models.CharField(max_length=70, null=True)
     fits_instrume = models.CharField(max_length=70, null=True)
     fits_observer = models.CharField(max_length=70, null=True)
+    match_distans = models.FloatField(default=2.0)
 
     class Meta:
         constraints = [
