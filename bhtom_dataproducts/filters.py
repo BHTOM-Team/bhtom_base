@@ -12,7 +12,7 @@ class DataProductFilter(django_filters.FilterSet):
     user = django_filters.CharFilter(label='Owner', method='filter_owner_name')
     status = django_filters.ChoiceFilter(label='Status', choices=DataProduct.STATUS)
     data_product_type = django_filters.ChoiceFilter(label='Type', choices=DATA_PRODUCT_TYPE_CHOICES, method='filter_data_product_type')
-    created = django_filters.DateTimeFilter(label='Upload date', lookup_expr='date')
+    created = django_filters.DateFromToRangeFilter(label='Upload date range')
 
     class Meta:
         model = DataProduct
