@@ -1,3 +1,4 @@
+import difflib
 import logging
 import os
 import tempfile
@@ -5,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Optional
 
+import bleach
 from PIL import Image
 from astropy.io import fits
 from django.conf import settings
@@ -87,6 +89,11 @@ def sanitize_folder_name(name):
     # Replace special characters with underscores
     return re.sub(r'[^a-zA-Z0-9_]', '_', name)
 
+def sanitize_file_name(name):
+    name_without_extension, extension = os.path.splitext(name)
+    sanitized_name = re.sub(r'[^a-zA-Z0-9_]', '_', name_without_extension)
+    cleaned_name = bleach.clean(sanitized_name, tags=[], attributes={}, protocols=[], strip=True)
+    return cleaned_name + extension
 
 def data_product_path(instance, filename):
     """
@@ -104,12 +111,17 @@ def data_product_path(instance, filename):
     """
     # Uploads go to MEDIA_ROOT
     data = 'data'
+    filename = sanitize_file_name(filename)
 
-    if instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry'][0] or \
-            instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry_nondetection'][0]:
+    if instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry'][0]:
         data = 'photometry'
+    elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['photometry_csv'][0]:
+        data = 'photometry_csv'
+    elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['spectroscopy'][0]:
+        data = 'spectroscopy'
     elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['fits_file'][0]:
         return 'fits/{0}/{1}'.format(sanitize_folder_name(instance.target.name), filename)
+
 
     if instance.observation_record is not None:
         return 'targets/{0}/{1}/{2}/{3}'.format(
@@ -125,8 +137,25 @@ def data_product_path(instance, filename):
             filename
         )
 
+class CleanData(models.Model):
+    class Meta:
+        abstract = True
 
-class DataProductGroup(models.Model):
+    def clean(self):
+        super().clean()
+
+        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField))]
+
+        for char_field in char_fields:
+            field_value = getattr(self, char_field.name)
+            if field_value is not None:
+                value = field_value.replace('\r', '')
+                cleaned_name = bleach.clean(value, tags=[], attributes={}, protocols=[], strip=True)
+                if cleaned_name != value:
+                    raise ValidationError("Invalid data format.")
+
+
+class DataProductGroup(CleanData):
     """
     Class representing a group of ``DataProduct`` objects in a TOM.
 
@@ -169,7 +198,7 @@ class DataProductGroup_user(models.Model):
         return self.user.username
 
 
-class DataProduct(models.Model):
+class DataProduct(CleanData):
     """
     Class representing a data product object in a TOM.
 
@@ -342,7 +371,7 @@ class DataProduct(models.Model):
         return
 
 
-class ReducedDatum(models.Model):
+class ReducedDatum(CleanData):
     """
     Class representing a datum in a TOM.
 
@@ -502,7 +531,7 @@ class AtlasBlock(models.Model):
     wait_time = models.FloatField(null=True, blank=True, default=None)
 
 
-class CCDPhotJob(models.Model):
+class CCDPhotJob(CleanData):
     JOB_STATUS_CHOICES = [
         ('P', 'Preparation'),
         ('R', 'Running'),
@@ -549,6 +578,7 @@ class CCDPhotJob(models.Model):
     fits_telescop = models.CharField(max_length=70, null=True)
     fits_instrume = models.CharField(max_length=70, null=True)
     fits_observer = models.CharField(max_length=70, null=True)
+    match_distans = models.FloatField(default=2.0)
 
     class Meta:
         constraints = [
@@ -556,7 +586,7 @@ class CCDPhotJob(models.Model):
         ]
 
 
-class SpectroscopyDatum(models.Model):
+class SpectroscopyDatum(CleanData):
     target = models.ForeignKey(Target, null=False, on_delete=models.CASCADE)
     data_product = models.ForeignKey(DataProduct, null=True, blank=True, on_delete=models.CASCADE)
     source_name = models.CharField(max_length=100, default='')

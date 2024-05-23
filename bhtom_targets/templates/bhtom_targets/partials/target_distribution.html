@@ -16,20 +16,20 @@
 
         var planets = {{ planets|safe}};
         
-        var circleM = A.circle(planets.moon_ra, planets.moon_dec, 30, {color: 'grey', lineWidth: 1});
+        {% comment %} var circleM = A.circle(planets.moon_ra, planets.moon_dec, 30, {color: 'grey', lineWidth: 1});
         var overlayM = A.graphicOverlay({name: 'Moon 30 deg',color: 'grey', lineWidth: 1});
         aladin.addOverlay(overlayM);
-        overlayM.add(circleM)
+        overlayM.add(circleM) {% endcomment %}
         
         var MoonLayer = A.catalog({name:'MOON',color:'grey',sourceSize:20});
         aladin.addCatalog(MoonLayer);
         var MoonMarker = A.marker(planets.moon_ra, planets.moon_dec, {popupTitle: 'MOON'});
         MoonLayer.addSources(MoonMarker);
         
-        var circle = A.circle(planets.sun_ra, planets.sun_dec, 45, {color: 'yellow', lineWidth: 1});
+        {% comment %} var circle = A.circle(planets.sun_ra, planets.sun_dec, 45, {color: 'yellow', lineWidth: 1});
         var overlay = A.graphicOverlay({name: 'Sun 45 deg',color: 'yellow', lineWidth: 1});
         aladin.addOverlay(overlay);
-        overlay.add(circle)
+        overlay.add(circle) {% endcomment %}
         
         var SunLayer = A.catalog({name:'SUN',color:'yellow',sourceSize:20});
         aladin.addCatalog(SunLayer);

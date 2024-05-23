@@ -29,7 +29,7 @@ from django_tables2.views import SingleTableMixin
 
 from bhtom2.bhtom_targets.utils import get_nonempty_names_from_queryset, check_for_existing_alias, \
     check_duplicate_source_names
-from bhtom2.external_service.data_source_information import PRETTY_SURVEY_NAME, get_pretty_survey_name
+from bhtom2.external_service.data_source_information import get_pretty_survey_name
 from bhtom_base.bhtom_common.hints import add_hint
 from bhtom_base.bhtom_common.hooks import run_hook
 from bhtom_base.bhtom_common.mixins import Raise403PermissionRequiredMixin

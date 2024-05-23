@@ -1,12 +1,14 @@
 from datetime import datetime
+
+import bleach
 from dateutil.parser import parse
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.forms.models import model_to_dict
 from django.urls import reverse
 
-from bhtom_base.bhtom_common.hooks import run_hook
 
 GLOBAL_TARGET_FIELDS = ['name', 'type']
 
@@ -32,8 +34,26 @@ REQUIRED_NON_SIDEREAL_FIELDS_PER_SCHEME = {
     'JPL_MAJOR_PLANET': ['mean_daily_motion', 'mean_anomaly', 'semimajor_axis']
 }
 
+class CleanData(models.Model):
+    class Meta:
+        abstract = True
 
-class Target(models.Model):
+    def clean(self):
+        super().clean()
+
+        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField))]
+
+        for char_field in char_fields:
+            field_value = getattr(self, char_field.name)
+            if field_value is not None:
+                value = field_value.replace('\r', '')
+                cleaned_name = bleach.clean(value, tags=[], attributes={}, protocols=[], strip=True)
+                if value != cleaned_name:
+
+                    raise ValidationError("Invalid data format.")
+
+
+class Target(CleanData):
     """
     Class representing a target in a TOM
 
@@ -289,7 +309,7 @@ class Target(models.Model):
     data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
     filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True, default='')
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True, default=0)
-    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True, db_index=True)
+    description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True)
 
     def get_classification_type_display(self):
         for key, display in settings.CLASSIFICATION_TYPES:
@@ -407,7 +427,7 @@ class Target(models.Model):
         return model_to_dict(self, fields=fields_for_type)
 
 
-class TargetName(models.Model):
+class TargetName(CleanData):
     """
     Class representing an alternative name for a ``Target``.
 
@@ -446,7 +466,7 @@ class TargetName(models.Model):
         return self.name
 
 
-class TargetExtra(models.Model):
+class TargetExtra(CleanData):
     """
     Class representing a list of targets in a TOM.
 
@@ -524,7 +544,7 @@ class TargetExtra(models.Model):
         return self.value
 
 
-class TargetList(models.Model):
+class TargetList(CleanData):
     """
     Class representing a list of targets in a TOM.
 
@@ -556,7 +576,7 @@ class TargetList(models.Model):
         return self.name
 
 
-class TargetGaiaDr3(models.Model):
+class TargetGaiaDr3(CleanData):
     target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='dr3')
     source_id = models.BigIntegerField(null=False, blank=False, unique=True, verbose_name='Source Id', db_index=True)
     parallax = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax')
@@ -587,7 +607,7 @@ class TargetGaiaDr3(models.Model):
         return self.target.name
 
 
-class TargetGaiaDr2(models.Model):
+class TargetGaiaDr2(CleanData):
     target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='dr2')
     source_id = models.BigIntegerField(null=False, blank=False, unique=True, verbose_name='Source Id', db_index=True)
     parallax = models.FloatField(null=True, blank=True, unique=False, verbose_name='Parallax')
