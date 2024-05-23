@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
+from django.contrib.auth.views import PasswordResetView
+from .forms import CustomPasswordResetForm
 
 from bhtom_base.bhtom_common.forms import ChangeUserPasswordForm, CustomUserCreationForm, GroupForm
 from bhtom_base.bhtom_common.mixins import SuperuserRequiredMixin
@@ -186,3 +188,14 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
             return super().delete(request, *args, **kwargs)
         else:
             return HttpResponseForbidden('Not authorized')
+
+
+class CustomPasswordResetView(PasswordResetView):
+    form_class = CustomPasswordResetForm
+    email_template_name = 'registration/password_reset_email.txt'
+    subject_template_name = 'registration/password_reset_subject.txt'
+      
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs

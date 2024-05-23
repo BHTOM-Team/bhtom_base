@@ -5,11 +5,27 @@ from django.contrib.auth.forms import UserCreationForm, UsernameField
 from django.contrib.auth.models import User, Group
 from bhtom_custom_registration.bhtom_registration.models import LatexUser
 from django.utils.translation import gettext_lazy as _
-
+from django import forms
+from django.contrib.auth.forms import PasswordResetForm
 
 class ChangeUserPasswordForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput())
 
+
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        if self.request is not None:
+            context['protocol'] = 'https' if self.request.is_secure() else 'http'
+            context['domain'] = self.request.get_host()
+        super().send_mail(subject_template_name, email_template_name,
+                          context, from_email, to_email, html_email_template_name)
 
 class GroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(User.objects.all(), required=False, widget=forms.CheckboxSelectMultiple)

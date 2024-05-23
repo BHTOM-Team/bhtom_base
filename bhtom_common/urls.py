@@ -21,7 +21,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.authtoken import views
-
+from .views import CustomPasswordResetView
+from django.contrib.auth import views as auth_views
 from bhtom_base.bhtom_common.api_views import GroupViewSet
 from bhtom_base.bhtom_common.views import UserListView, UserPasswordChangeView, UserCreateView, UserDeleteView, UserUpdateView
 from bhtom_base.bhtom_common.views import CommentDeleteView, GroupCreateView, GroupUpdateView, GroupDeleteView
@@ -50,6 +51,10 @@ urlpatterns = [
     path('groups/<int:pk>/delete/', GroupDeleteView.as_view(), name='group-delete'),
     path('accounts/login/', LoginView.as_view(), name='login'),
     path('accounts/logout/', LogoutView.as_view(), name='logout'),
+    path('password_reset/', CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('comment/<int:pk_target>//<int:pk>/delete', CommentDeleteView.as_view(), name='comment-delete'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
