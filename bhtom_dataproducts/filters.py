@@ -29,7 +29,7 @@ class DataProductFilter(django_filters.FilterSet):
         return queryset.filter(Q(user__first_name__icontains=value))
     
     def filter_observatory_name(self, queryset, name, value):
-        return queryset.filter(Q(observatory__camera__observatory__name=value))
+        return queryset.filter(Q(observatory__camera__observatory__name__icontains=value))
     
     def filter_data_product_type(self, queryset, name, value):
         # Reverse mapping from display value to database value
