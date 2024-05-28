@@ -1,7 +1,8 @@
 import django_filters
 from django.conf import settings
 from django.db.models import Q
-from bhtom_base.bhtom_dataproducts.models import DataProduct
+from bhtom_base.bhtom_dataproducts.models import DataProduct, SpectroscopyDatum
+from bhtom2.bhtom_calibration.models import Calibration_data
 
 # Extracting choices from settings.DATA_PRODUCT_TYPES
 DATA_PRODUCT_TYPE_CHOICES = [(v[1], v[1]) for k, v in settings.DATA_PRODUCT_TYPES.items()]
@@ -12,7 +13,10 @@ class DataProductFilter(django_filters.FilterSet):
     user = django_filters.CharFilter(label='Owner', method='filter_owner_name')
     status = django_filters.ChoiceFilter(label='Status', choices=DataProduct.STATUS)
     data_product_type = django_filters.ChoiceFilter(label='Type', choices=DATA_PRODUCT_TYPE_CHOICES, method='filter_data_product_type')
-    created = django_filters.DateFromToRangeFilter(label='Upload date range')
+    mjd = django_filters.NumberFilter(label='MJD', method='filter_mjd')
+
+    created = django_filters.DateFromToRangeFilter(label='Date Range (yyyy-mm-dd)', 
+        help_text='Select a date range for the creation date.')
 
     class Meta:
         model = DataProduct
@@ -38,3 +42,9 @@ class DataProductFilter(django_filters.FilterSet):
         if database_value:
             return queryset.filter(Q(data_product_type__iexact=database_value))
         return queryset.none()
+    
+    def filter_mjd(self, queryset, name, value):
+           return queryset.filter(
+            Q(spectroscopydatum__mjd=value) | 
+            Q(calibration_data__mjd=value)
+        )
