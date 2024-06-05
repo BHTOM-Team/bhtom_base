@@ -5,7 +5,7 @@ from django.contrib import admin
 from django_guid import get_guid
 from dotenv import dotenv_values
 
-from bhtom2.settings import BASE_DIR
+from settings.settings import BASE_DIR
 from bhtom2.utils.bhtom_logger import BHTOMLogger
 from bhtom_base.bhtom_dataproducts.models import DataProduct, DataProductGroup, ReducedDatum
 
@@ -29,7 +29,7 @@ class ReducedDatumAdmin(admin.ModelAdmin):
 
 
 def updatePlot(targetName):
-    secret = dotenv_values(os.path.join(BASE_DIR, 'bhtom2/.bhtom.env'))
+    secret = dotenv_values(os.path.join(BASE_DIR, 'settings/.bhtom.env'))
 
     try:
         guid = get_guid()
