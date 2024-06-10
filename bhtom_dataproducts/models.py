@@ -89,11 +89,13 @@ def sanitize_folder_name(name):
     # Replace special characters with underscores
     return re.sub(r'[^a-zA-Z0-9_]', '_', name)
 
+
 def sanitize_file_name(name):
     name_without_extension, extension = os.path.splitext(name)
     sanitized_name = re.sub(r'[^a-zA-Z0-9_]', '_', name_without_extension)
     cleaned_name = bleach.clean(sanitized_name, tags=[], attributes={}, protocols=[], strip=True)
     return cleaned_name + extension
+
 
 def data_product_path(instance, filename):
     """
@@ -122,7 +124,6 @@ def data_product_path(instance, filename):
     elif instance.data_product_type == settings.DATA_PRODUCT_TYPES['fits_file'][0]:
         return 'fits/{0}/{1}'.format(sanitize_folder_name(instance.target.name), filename)
 
-
     if instance.observation_record is not None:
         return 'targets/{0}/{1}/{2}/{3}'.format(
             sanitize_folder_name(instance.target.name),
@@ -137,6 +138,7 @@ def data_product_path(instance, filename):
             filename
         )
 
+
 class CleanData(models.Model):
     class Meta:
         abstract = True
@@ -144,7 +146,8 @@ class CleanData(models.Model):
     def clean(self):
         super().clean()
 
-        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField))]
+        char_fields = [field for field in self._meta.get_fields() if
+                       isinstance(field, (models.CharField, models.TextField))]
 
         for char_field in char_fields:
             field_value = getattr(self, char_field.name)
@@ -598,10 +601,9 @@ class SpectroscopyDatum(CleanData):
     flux = ArrayField(models.FloatField(null=False, blank=False), null=False, blank=False)
     flux_units = models.CharField(null=False, blank=False, max_length=50, default='erg/(Angstrom s cm2)')
     wavelength = ArrayField(models.FloatField(null=False, blank=False), null=False, blank=False)
-    wavelength_units = models.CharField(null=False,blank=False, max_length=50, default='Angstrom')
+    wavelength_units = models.CharField(null=False, blank=False, max_length=50, default='Angstrom')
     active_flg = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (('target', 'mjd', 'facility', 'observer'),)
         get_latest_by = ('mjd',)
-
