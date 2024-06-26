@@ -29,7 +29,7 @@ class ReducedDatumAdmin(admin.ModelAdmin):
 
 
 def updatePlot(targetName):
-    secret = dotenv_values(os.path.join(BASE_DIR, 'settings/.bhtom.env'))
+    secret = dotenv_values(os.path.join(BASE_DIR, 'settings/env/.bhtom.env'))
 
     try:
         guid = get_guid()
