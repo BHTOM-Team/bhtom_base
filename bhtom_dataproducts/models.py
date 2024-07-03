@@ -137,7 +137,14 @@ def data_product_path(instance, filename):
             data,
             filename
         )
-
+def webp_data_path(instance, filename):
+   
+    # Uploads go to MEDIA_ROOT
+    filename = sanitize_file_name(filename)
+    return 'fits/images/{0}/{1}'.format(
+        sanitize_folder_name(instance.target.name),
+        filename
+    )
 
 class CleanData(models.Model):
     class Meta:
@@ -270,6 +277,7 @@ class DataProduct(CleanData):
     status = models.CharField(max_length=1, choices=STATUS, default='C')
     photometry_data = models.URLField(null=True, blank=True, default=None)
     fits_data = models.URLField(null=True, blank=True, default=None)
+    fits_webp = models.FileField(upload_to=webp_data_path, null=True, default='')
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup, blank=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
