@@ -1,5 +1,7 @@
 
 import csv
+
+from bhtom2.utils.bhtom_logger import BHTOMLogger
 from .models import Target, TargetExtra, TargetName
 from io import StringIO
 from django.db.models import ExpressionWrapper, FloatField
@@ -8,6 +10,8 @@ from django.conf import settings
 from math import radians
 from bhtom_base.bhtom_common.hooks import run_hook
 from django.forms.models import model_to_dict
+
+logger: BHTOMLogger = BHTOMLogger(__name__, 'bhtom: utils')
 
 
 # NOTE: This saves locally. To avoid this, create file buffer.
@@ -30,8 +34,13 @@ def export_targets(qs):
     
     all_fields = target_fields + target_extra_fields + [f'{sn.upper()}_name' for sn in
                                                      set(TargetName.objects.filter(target__in=qs_pk).values_list('source_name', flat=True))]
-    for key in ['id','brokercadence','dr3','dr2', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum', 'aliases', 'targetextra', 'photometry_plot', 'photometry_plot_obs', 'photometry_icon_plot', 'spectroscopy_plot', 'data_plot', 'modified','created']:
-        all_fields.remove(key)
+    for key in ['id','brokercadence', 'dr3', 'dr2', 'targetlist', 'dataproduct', 'observationrecord', 'reduceddatum',
+                'aliases', 'targetextra', 'photometry_plot', 'photometry_plot_obs', 'photometry_icon_plot',
+                'spectroscopy_plot', 'data_plot', 'modified', 'created', 'spectroscopydatum', 'atlasqueue']:
+        try:
+            all_fields.remove(key)
+        except Exception as e:
+            logger.warning(f'Could not remove {key}: {e}')
 
     file_buffer = StringIO()
     writer = csv.DictWriter(file_buffer, fieldnames=all_fields)
