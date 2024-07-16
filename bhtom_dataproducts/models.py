@@ -18,6 +18,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from fits2image.conversions import fits_to_jpg
 
+from bhtom2.bhtom_calibration.models import Catalogs
 from bhtom2.bhtom_observatory.models import Observatory, ObservatoryMatrix
 from bhtom_base.bhtom_observations.models import ObservationRecord
 from bhtom_base.bhtom_targets.models import Target
@@ -590,6 +591,7 @@ class CCDPhotJob(CleanData):
     fits_instrume = models.CharField(max_length=70, null=True)
     fits_observer = models.CharField(max_length=70, null=True)
     match_distans = models.FloatField(default=2.0)
+    use_catalog = models.ForeignKey(Catalogs, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         constraints = [
