@@ -590,6 +590,7 @@ class CCDPhotJob(CleanData):
     fits_instrume = models.CharField(max_length=70, null=True)
     fits_observer = models.CharField(max_length=70, null=True)
     match_distans = models.FloatField(default=2.0)
+    use_catalog = models.IntegerField(default=39, null=True, blank=True)  # Gaia any
 
     class Meta:
         constraints = [
