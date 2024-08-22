@@ -11,6 +11,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.contrib.auth.views import PasswordResetView
 from .forms import CustomPasswordResetForm
+from django.conf import settings
 
 from bhtom_base.bhtom_common.forms import ChangeUserPasswordForm, CustomUserCreationForm, GroupForm
 from bhtom_base.bhtom_common.mixins import SuperuserRequiredMixin
@@ -194,8 +195,18 @@ class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm
     email_template_name = 'registration/password_reset_email.txt'
     subject_template_name = 'registration/password_reset_subject.txt'
-      
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+
+class CustomIndexView(TemplateView):
+    template_name = 'bhtom_common/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['logo_text'] = settings.LOGO_TEXT
+        context['wallpaper'] = settings.CUST_WALLPAPER
+        context['title_text'] = settings.TITLE_TEXT
+        return context

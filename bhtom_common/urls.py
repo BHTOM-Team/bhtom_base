@@ -29,11 +29,13 @@ from bhtom_base.bhtom_common.views import CommentDeleteView, GroupCreateView, Gr
 
 from .api_router import collect_api_urls, SharedAPIRootRouter  # DRF routers are setup in each INSTALL_APPS url.py
 
+from .views import CustomIndexView
+
 router = SharedAPIRootRouter()
 router.register(r'groups', GroupViewSet, 'groups')
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='bhtom_common/index.html'), name='home'),
+    path('', CustomIndexView.as_view(), name='home'),
     path('about/',TemplateView.as_view(template_name='bhtom_common/about.html'), name='about'),
     path('targets/', include('bhtom_base.bhtom_targets.urls', namespace='targets')),
     path('alerts/', include('bhtom_base.bhtom_alerts.urls', namespace='alerts')),
