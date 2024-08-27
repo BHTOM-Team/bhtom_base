@@ -5,6 +5,7 @@ from dateutil.parser import parse
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.forms.models import model_to_dict
 from django.urls import reverse
@@ -630,3 +631,28 @@ class TargetGaiaDr2(CleanData):
 
     def __str__(self):
         return self.target.name
+
+
+
+class DownloadedTarget(CleanData):
+    TYPE = [
+        ('R', 'RADIO'),
+        ('P', 'PHOTOMETRY'),
+    ]
+    target = models.ForeignKey(Target, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created = models.DateTimeField(
+        auto_now_add=True, help_text='The time which this record was created in the TOM database.'
+    )
+    modified = models.DateTimeField(
+        auto_now=True, verbose_name='Last Modified',
+        help_text='The time which this record was changed in the TOM database.'
+    )
+    download_type = models.CharField(max_length=1, choices=TYPE, default='P')
+    ip_address = models.CharField(max_length=25)
+
+    class Meta:
+        ordering = ('-created', 'target',)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.target.name} - {self.download_type} - {self.created} - {self.ip_address}'

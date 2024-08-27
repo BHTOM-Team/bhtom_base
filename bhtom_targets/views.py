@@ -3,6 +3,7 @@ from datetime import datetime
 from io import StringIO
 from urllib.parse import urlencode
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,7 +27,7 @@ from guardian.mixins import PermissionListMixin
 from guardian.shortcuts import get_objects_for_user, get_groups_with_perms, assign_perm
 from django_tables2 import Table
 from django_tables2.views import SingleTableMixin
-
+from django.http import Http404
 from bhtom2.bhtom_targets.utils import get_nonempty_names_from_queryset, check_for_existing_alias, \
     check_duplicate_source_names
 from bhtom2.external_service.data_source_information import get_pretty_survey_name
@@ -404,6 +405,7 @@ class TargetDetailView(LoginRequiredMixin, DetailView):
     model = Target
     slug_field = 'name'
     slug_url_kwarg = 'name'
+
     
     def get_context_data(self, *args, **kwargs):
         """
@@ -433,6 +435,14 @@ class TargetDetailView(LoginRequiredMixin, DetailView):
         :param request: the request object passed to this view
         :type request: HTTPRequest
         """
+        target_name = self.kwargs.get('name')
+        try:
+            # This will trigger the get_object method to fetch the target
+            self.object = self.get_object()
+        except Http404:
+            # Redirect to a custom error page if the object is not found
+            return redirect(reverse('bhtom_targets:target_not_found')+  f'?target_name={target_name}')
+        
         update_status = request.GET.get('update_status', False)
         if update_status:
             if not request.user.is_authenticated:
