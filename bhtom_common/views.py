@@ -209,4 +209,5 @@ class CustomIndexView(TemplateView):
         context['logo_text'] = settings.LOGO_TEXT
         context['wallpaper'] = settings.CUST_WALLPAPER
         context['title_text'] = settings.TITLE_TEXT
+        context['customization'] = settings.CUSTOMIZATION
         return context
