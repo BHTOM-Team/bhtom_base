@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from bhtom_base.bhtom_targets.forms import TargetNamesFormset
-from .models import Target, TargetList, TargetExtra, TargetName
+from .models import Target, TargetList, TargetExtra, TargetName, DownloadedTarget
 from bhtom2.bhtom_targets.utils import get_nonempty_names_from_queryset
 from ..bhtom_common.hooks import run_hook
 
@@ -41,6 +41,13 @@ class TargetListAdmin(admin.ModelAdmin):
     model = TargetList
 
 
+
+class DownloadedTargetAdmin(admin.ModelAdmin):
+    model = DownloadedTarget
+
+
 admin.site.register(Target, TargetAdmin)
 
 admin.site.register(TargetList, TargetListAdmin)
+
+admin.site.register(DownloadedTarget, DownloadedTargetAdmin)
