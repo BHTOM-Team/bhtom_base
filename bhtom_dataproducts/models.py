@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 import bleach
+import html
 from PIL import Image
 from astropy.io import fits
 from django.conf import settings
@@ -160,8 +161,9 @@ class CleanData(models.Model):
             field_value = getattr(self, char_field.name)
             if field_value is not None:
                 value = field_value.replace('\r', '')
-                cleaned_name = bleach.clean(value, tags=[], attributes={}, protocols=[], strip=True)
-                if cleaned_name != value:
+                escaped_value = html.escape(value)
+                cleaned_name = bleach.clean(escaped_value, tags=[], attributes={}, protocols=[], strip=True)
+                if cleaned_name != escaped_value:
                     raise ValidationError("Invalid data format.")
 
 

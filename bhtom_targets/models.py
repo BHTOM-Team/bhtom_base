@@ -2,7 +2,7 @@ from datetime import datetime
 
 import bleach
 from dateutil.parser import parse
-
+import html
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -48,8 +48,9 @@ class CleanData(models.Model):
             field_value = getattr(self, char_field.name)
             if field_value is not None:
                 value = field_value.replace('\r', '')
-                cleaned_name = bleach.clean(value, tags=[], attributes={}, protocols=[], strip=True)
-                if value != cleaned_name:
+                escaped_value = html.escape(value)
+                cleaned_name = bleach.clean(escaped_value, tags=[], attributes={}, protocols=[], strip=True)
+                if escaped_value != cleaned_name:
 
                     raise ValidationError("Invalid data format.")
 
