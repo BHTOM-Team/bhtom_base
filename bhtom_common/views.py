@@ -11,6 +11,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.contrib.auth.views import PasswordResetView
 from .forms import CustomPasswordResetForm
+from rest_framework.authtoken.models import Token
 
 from bhtom_base.bhtom_common.forms import ChangeUserPasswordForm, CustomUserCreationForm, GroupForm
 from bhtom_base.bhtom_common.mixins import SuperuserRequiredMixin
@@ -120,6 +121,16 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'bhtom_common/create_user.html'
     form_class = CustomUserCreationForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        try:
+            token = Token.objects.get(user=user) 
+            context['user_token'] = token.key
+        except Token.DoesNotExist:
+            context['user_token'] = None
+        return context
+    
     def get_success_url(self):
         """
         Returns the redirect URL for a successful update. If the current user is a superuser, returns the URL for the
