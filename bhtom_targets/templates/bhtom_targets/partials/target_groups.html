@@ -2,6 +2,23 @@
 
 <h4>Groups</h4>
 
+<form id="grouping-form" action="{% url 'targets:add-new-grouping' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group d-flex justify-content-end align-items-baseline">
+        <label for="groupingInput">Create New Group and Add This Target </label>
+        <input 
+            type="text" 
+            name="grouping" 
+            id="groupingInput" 
+            class="form-control w-25 ml-1" 
+            placeholder="Enter group name">
+        
+        <input type="hidden" id="query_string" value="targetlist__name={{ groupings.0.id }}" name="query_string">
+        <input type="hidden" name="selected-target" value="{{ target.id }}"/>
+        <button type="submit" class="btn btn-outline-primary ml-1" name="add">Create and Add</button>
+    </div>
+</form>
+
 {%  if groupings %}
     <form id="grouping-form" action="{% url 'targets:add-remove-grouping' %}" method="POST">
         {% csrf_token %}
