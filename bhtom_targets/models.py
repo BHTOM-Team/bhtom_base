@@ -263,7 +263,7 @@ class Target(CleanData):
 
     classification = models.CharField(
         max_length=50, null=True, blank=True, verbose_name='classification', choices=settings.CLASSIFICATION_TYPES,
-        help_text='Classification of the object (e.g. variable star, microlensing event)', db_index=True
+        db_index=True
     )
     discovery_date = models.DateTimeField(
         verbose_name='discovery date', help_text='Date of the discovery, YYYY-MM-DDTHH:MM:SS, or leave blank',
@@ -277,13 +277,13 @@ class Target(CleanData):
     )
     importance = models.FloatField(
         verbose_name='importance',
-        help_text='Target importance as an integer 0-10 (10 is the highest)',
+        help_text='Target importance as a float: 10 - target requested for immediate observations, 0 - no need for follow-up observations.',
         default=0,
         db_index=True
     )
     cadence = models.FloatField(
         verbose_name='cadence',
-        help_text='Requested cadence (0-100 days)',
+        help_text='Requested cadence in days (0 - target does not require follow-up observations)',
         default=0
     )
     priority = models.FloatField(
