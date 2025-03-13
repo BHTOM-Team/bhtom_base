@@ -572,7 +572,6 @@ class TargetGroupingView(PermissionListMixin, ListView):
     permission_required = 'bhtom_targets.view_targetlist'
     template_name = 'bhtom_targets/target_grouping.html'
     model = TargetList
-    paginate_by = 25
 
 
 class TargetGroupingDeleteView(Raise403PermissionRequiredMixin, DeleteView):
