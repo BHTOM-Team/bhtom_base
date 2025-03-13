@@ -154,7 +154,7 @@ def cone_search_filter(queryset, ra, dec, radius):
         dec__gte=dec - double_radius, dec__lte=dec + double_radius
     )
 
-    # Perform the cone search using astropy
+    # Perform the cone search using astropy 
     results = []
     for target in queryset:
         target_coord = SkyCoord(ra=target.ra * u.degree, dec=target.dec * u.degree, frame='icrs')
