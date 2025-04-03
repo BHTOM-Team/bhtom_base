@@ -7,11 +7,15 @@ from bhtom_custom_registration.bhtom_registration.models import LatexUser
 from django.utils.translation import gettext_lazy as _
 from django import forms
 from django.contrib.auth.forms import PasswordResetForm
+from captcha.fields import CaptchaField
+from django.utils.safestring import mark_safe
+from django.templatetags.static import static  
+
+terms_url = static("bhtom_common/terms_and_conditions.pdf") 
+
 
 class ChangeUserPasswordForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput())
-
-
 
 
 class CustomPasswordResetForm(PasswordResetForm):
@@ -97,10 +101,13 @@ class CustomUserCreationForm(UserCreationForm):
     )
 
     accepted_terms = forms.BooleanField(
-        label='I accept the terms and conditions*',
-        required=True,
-        error_messages={'required': 'You must accept the terms and conditions to proceed.'}
-    )
+    label=mark_safe(f'I accept the terms and conditions*  <a href="{terms_url}" target="_blank">Read Terms and Conditions</a>'),
+    required=True,
+    error_messages={'required': 'You must accept the terms and conditions to proceed.'}
+)
+
+
+    captcha = CaptchaField()
 
     class Meta:
         model = User
