@@ -461,7 +461,7 @@ class ReducedDatum(CleanData):
     mjd = models.FloatField(null=False, default=0)
     timestamp = models.DateTimeField(null=False, blank=False, default=datetime.now, db_index=True)
     observer = models.CharField(null=False, max_length=100, default='')
-    observers = models.JSONField(default=list, blank=True)
+    observers = models.JSONField(default=list, blank=True,null=True)
     facility = models.CharField(null=False, max_length=100, default='')
     value = models.FloatField(null=False, default=100)
     value_list = ArrayField(models.FloatField(), null=True, blank=True, default=list)
