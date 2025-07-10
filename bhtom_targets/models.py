@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import re
 import bleach
 from dateutil.parser import parse
 import html
@@ -51,9 +51,10 @@ class CleanData(models.Model):
                 escaped_value = html.escape(value)
                 cleaned_name = bleach.clean(escaped_value, tags=[], attributes={}, protocols=[], strip=True)
                 if escaped_value != cleaned_name:
-
                     raise ValidationError("Invalid data format.")
-
+                if re.search(r'[\\/:\.]', value):
+                    raise ValidationError(f"Field {char_field.name} contains forbidden characters (/ \\ : .)")
+            
 
 class Target(CleanData):
     """
