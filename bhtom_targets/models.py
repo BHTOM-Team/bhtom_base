@@ -42,7 +42,7 @@ class CleanData(models.Model):
     def clean(self):
         super().clean()
 
-        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField))]
+        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField)) and field.name != 'phot_class']
 
         for char_field in char_fields:
             field_value = getattr(self, char_field.name)
