@@ -42,7 +42,8 @@ class CleanData(models.Model):
     def clean(self):
         super().clean()
 
-        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField)) and field.name != 'phot_class']
+        char_fields = [field for field in self._meta.get_fields() if isinstance(field, (models.CharField, models.TextField)) and field.name != 'phot_class' and
+                        field.name != 'filter_last' and field.name != "constellation" and field.name != "scheme"]
 
         for char_field in char_fields:
             field_value = getattr(self, char_field.name)
@@ -305,12 +306,12 @@ class Target(CleanData):
     phot_class = models.CharField(max_length=50,
                                   verbose_name='phot class', null=True, blank=True
                                   )
-    photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, blank=True, default=None)
-    photometry_plot_obs = models.FileField(upload_to=photometry_plot_obs_path, null=True, blank=True, default=None)
-    photometry_icon_plot = models.FileField(upload_to=photometry_icon_plot_path, null=True, blank=True, default=None)
-    spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None)
-    data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True)
-    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True, default='')
+    photometry_plot = models.FileField(upload_to=photometry_plot_path, null=True, blank=True, default=None, max_length=300)
+    photometry_plot_obs = models.FileField(upload_to=photometry_plot_obs_path, null=True, blank=True, default=None, max_length=300)
+    photometry_icon_plot = models.FileField(upload_to=photometry_icon_plot_path, null=True, blank=True, default=None, max_length=300)
+    spectroscopy_plot = models.FileField(upload_to=spectroscopy_plot_path, null=True, blank=True, default=None, max_length=300)
+    data_plot = models.DateTimeField(verbose_name='creation plot date', null=True, blank=True, max_length=300)
+    filter_last = models.CharField(max_length=20, verbose_name='last filter', null=True, blank=True, default='',)
     cadence_priority = models.FloatField(verbose_name='cadence priority', null=True, blank=True, default=0)
     description = models.CharField(max_length=200, verbose_name='description', null=True, blank=True)
 
