@@ -53,7 +53,7 @@ class CleanData(models.Model):
                 cleaned_name = bleach.clean(escaped_value, tags=[], attributes={}, protocols=[], strip=True)
                 if escaped_value != cleaned_name:
                     raise ValidationError("Invalid data format.")
-                if re.search(r'[\\/:\]', value):
+                if re.search(r'[\\\\/:]', value):
                     raise ValidationError(f"Field {char_field.name} contains forbidden characters (/ \\ : )")
             
 
