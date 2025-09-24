@@ -616,7 +616,9 @@ class CCDPhotJob(CleanData):
     fits_dryrun = models.CharField(max_length=10, null=True, blank=True, help_text='DRYRUN - dry run flag')
     fits_nodeid = models.CharField(max_length=70, null=True, blank=True, help_text='NODEID - processing node ID')
     fits_pipever = models.CharField(max_length=70, null=True, blank=True, help_text='PIPEVER - pipeline version')
- 
+    fits_glim = models.FloatField(null=True, blank=True, help_text='GLIM')
+    fits_toiifov = models.CharField(max_length=70, null=True, blank=True, help_text='TOIIFOV - TOI Input Field of View')
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['job_id'], name='unique_job_id')
