@@ -595,7 +595,30 @@ class CCDPhotJob(CleanData):
     fits_observer = models.CharField(max_length=70, null=True)
     match_distans = models.FloatField(default=2.0)
     use_catalog = models.IntegerField(default=39, null=True, blank=True)  # Gaia any
-
+    fits_fwhm_x = models.FloatField(null=True, blank=True, help_text='FWHM_X - Full Width Half Maximum in X direction')
+    fits_fwhm_y = models.FloatField(null=True, blank=True, help_text='FWHM_Y - Full Width Half Maximum in Y direction')
+    fits_fwhm_av = models.FloatField(null=True, blank=True, help_text='FWHM_AV - Average Full Width Half Maximum')
+    fits_seeing = models.FloatField(null=True, blank=True, help_text='SEEING - atmospheric seeing in arcseconds')
+    fits_airmass = models.FloatField(null=True, blank=True, help_text='AIRMASS - airmass at observation')
+    fits_photflag = models.IntegerField(null=True, blank=True, help_text='PHOTFLAG - photometric flag')
+    fits_moonelev = models.FloatField(null=True, blank=True, help_text='MOONELEV - moon elevation in degrees')
+    fits_sunelev = models.FloatField(null=True, blank=True, help_text='SUNELEV - sun elevation in degrees')
+    fits_moondist = models.FloatField(null=True, blank=True, help_text='MOONDIST - distance to moon in degrees')
+    fits_moonaz = models.FloatField(null=True, blank=True, help_text='MOONAZ - moon azimuth in degrees')
+    fits_sunaz = models.FloatField(null=True, blank=True, help_text='SUNAZ - sun azimuth in degrees')
+    fits_sundist = models.FloatField(null=True, blank=True, help_text='SUNDIST - distance to sun in degrees')
+    fits_moonfrac = models.FloatField(null=True, blank=True, help_text='MOONFRAC - moon fraction (0-1)')
+    fits_numstars = models.IntegerField(null=True, blank=True, help_text='NUMSTARS - number of detected stars')
+    fits_filename = models.CharField(max_length=255, null=True, blank=True, help_text='FILENAME - original filename')
+    fits_bjd = models.FloatField(null=True, blank=True, help_text='BJD - Barycentric Julian Date')
+    fits_uploader = models.CharField(max_length=70, null=True, blank=True, help_text='UPLOADER - who uploaded the file')
+    fits_oname = models.CharField(max_length=70, null=True, blank=True, help_text='ONAME - original object name')
+    fits_dryrun = models.CharField(max_length=10, null=True, blank=True, help_text='DRYRUN - dry run flag')
+    fits_nodeid = models.CharField(max_length=70, null=True, blank=True, help_text='NODEID - processing node ID')
+    fits_pipever = models.CharField(max_length=70, null=True, blank=True, help_text='PIPEVER - pipeline version')
+    fits_glim = models.FloatField(null=True, blank=True, help_text='GLIM')
+    fits_toiifov = models.CharField(max_length=70, null=True, blank=True, help_text='TOIIFOV - TOI Input Field of View')
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['job_id'], name='unique_job_id')
