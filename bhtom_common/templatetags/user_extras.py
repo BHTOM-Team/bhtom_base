@@ -22,5 +22,5 @@ def user_list(context):
     """
     return {
         'request': context['request'],
-        'users': User.objects.all()
+        'users': User.objects.filter(is_active=True)
     }
