@@ -49,7 +49,14 @@
   {{ filter.fields }}
   <div class="col-md-2">
     <form action="" method="get" class="form">
-      {% bootstrap_form filter.form %}
+      {% bootstrap_form filter.form exclude='has_optical,has_infrared,has_radio,has_xray,has_gamma,has_polarimetry' %}
+      <h6>Data Types</h6>
+      {% bootstrap_field filter.form.has_optical %}
+      {% bootstrap_field filter.form.has_infrared %}
+      {% bootstrap_field filter.form.has_radio %}
+      {% bootstrap_field filter.form.has_xray %}
+      {% bootstrap_field filter.form.has_gamma %}
+      {% bootstrap_field filter.form.has_polarimetry %}
       {% buttons %}
         <button type="submit" class="btn btn-primary">
           Filter
