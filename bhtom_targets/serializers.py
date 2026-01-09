@@ -137,7 +137,8 @@ class TargetSerializer(serializers.ModelSerializer):
             if tes.is_valid():
                 tes.save(target=instance)
 
-        fields_to_validate = ['name', 'type', 'ra', 'dec', 'epoch', 'parallax', 'pm_ra', 'pm_dec', 'galactic_lng',
+        fields_to_validate = ['name', 'type', 'has_optical', 'has_infrared', 'has_radio', 'has_xray', 'has_gamma',
+                              'has_polarimetry', 'ra', 'dec', 'epoch', 'parallax', 'pm_ra', 'pm_dec', 'galactic_lng',
                               'galactic_lat', 'distance', 'distance_err', 'scheme', 'epoch_of_elements',
                               'mean_anomaly', 'arg_of_perihelion', 'eccentricity', 'lng_asc_node', 'inclination',
                               'mean_daily_motion', 'semimajor_axis', 'epoch_of_perihelion', 'ephemeris_period',
