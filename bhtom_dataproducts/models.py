@@ -36,6 +36,8 @@ class ReducedDatumUnit(models.TextChoices):
     MAGNITUDE = 'MAG', _('mag')
     MILLIJANSKY = 'MILLIJANSKY', _('mJy')
     ERG_S_CM2_ANGSTROM = 'ERG_S_CM2_ANGSTROM', _('erg/s/cm^2/Angstrom')
+    COUNTS = 'COUNTS', _('cts')
+    FLUX = 'FLUX', _('erg/s/cm^2')
 
 
 def find_fits_img_size(filename):
