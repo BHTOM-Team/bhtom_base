@@ -44,6 +44,12 @@ def filter_text(queryset, name, value):
 class TargetFilter(django_filters.FilterSet):
     key = django_filters.CharFilter(field_name='targetextra__key', label='Key')
     value = django_filters.CharFilter(field_name='targetextra__value', label='Value')
+    has_optical = django_filters.BooleanFilter(field_name='has_optical', label='Has Optical')
+    has_infrared = django_filters.BooleanFilter(field_name='has_infrared', label='Has Infrared')
+    has_radio = django_filters.BooleanFilter(field_name='has_radio', label='Has Radio')
+    has_xray = django_filters.BooleanFilter(field_name='has_xray', label='Has X-ray')
+    has_gamma = django_filters.BooleanFilter(field_name='has_gamma', label='Has Gamma')
+    has_polarimetry = django_filters.BooleanFilter(field_name='has_polarimetry', label='Has Polarimetry')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -51,6 +57,13 @@ class TargetFilter(django_filters.FilterSet):
             new_filter = filter_for_field(field)
             new_filter.parent = self
             self.filters[field['name']] = new_filter
+        if not self.form.is_bound:
+            for flag in (
+                'has_optical', 'has_infrared', 'has_radio',
+                'has_xray', 'has_gamma', 'has_polarimetry'
+            ):
+                if flag in self.form.fields:
+                    self.form.fields[flag].initial = True
 
     name = django_filters.CharFilter(method='filter_name', label='Name')
 
@@ -109,4 +122,7 @@ class TargetFilter(django_filters.FilterSet):
 
     class Meta:
         model = Target
-        fields = ['type', 'name', 'key', 'value', 'cone_search', 'targetlist__name']
+        fields = [
+            'type', 'name', 'key', 'value', 'cone_search', 'targetlist__name',
+            'has_optical', 'has_infrared', 'has_radio', 'has_xray', 'has_gamma', 'has_polarimetry'
+        ]

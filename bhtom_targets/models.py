@@ -11,7 +11,10 @@ from django.forms.models import model_to_dict
 from django.urls import reverse
 
 
-GLOBAL_TARGET_FIELDS = ['name', 'type']
+GLOBAL_TARGET_FIELDS = [
+    'name', 'type',
+    'has_optical', 'has_infrared', 'has_radio', 'has_xray', 'has_gamma', 'has_polarimetry'
+]
 
 SIDEREAL_FIELDS = GLOBAL_TARGET_FIELDS + [
     'ra', 'dec', 'epoch', 'pm_ra', 'pm_dec', 'galactic_lng', 'galactic_lat', 'distance', 'distance_err'
@@ -174,6 +177,30 @@ class Target(CleanData):
     )
     type = models.CharField(
         max_length=100, choices=TARGET_TYPES, verbose_name='Target Type', help_text='The type of this target.', db_index=True
+    )
+    has_optical = models.BooleanField(
+        default=False, verbose_name='has optical',
+        help_text='True when the target has optical data.'
+    )
+    has_infrared = models.BooleanField(
+        default=False, verbose_name='has infrared',
+        help_text='True when the target has infrared data.'
+    )
+    has_radio = models.BooleanField(
+        default=False, verbose_name='has radio',
+        help_text='True when the target has radio data.'
+    )
+    has_xray = models.BooleanField(
+        default=False, verbose_name='has X-ray',
+        help_text='True when the target has X-ray data.'
+    )
+    has_gamma = models.BooleanField(
+        default=False, verbose_name='has gamma',
+        help_text='True when the target has gamma-ray data.'
+    )
+    has_polarimetry = models.BooleanField(
+        default=False, verbose_name='has polarimetry',
+        help_text='True when the target has polarimetry data.'
     )
     created = models.DateTimeField(
         auto_now_add=True, verbose_name='Time Created',
