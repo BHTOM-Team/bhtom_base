@@ -179,26 +179,32 @@ class Target(CleanData):
         max_length=100, choices=TARGET_TYPES, verbose_name='Target Type', help_text='The type of this target.', db_index=True
     )
     has_optical = models.BooleanField(
+        null=True, 
         default=False, verbose_name='has optical',
         help_text='True when the target has optical data.'
     )
     has_infrared = models.BooleanField(
+        null=True, blank=True,
         default=False, verbose_name='has infrared',
         help_text='True when the target has infrared data.'
     )
     has_radio = models.BooleanField(
+        null=True, blank=True,
         default=False, verbose_name='has radio',
         help_text='True when the target has radio data.'
     )
     has_xray = models.BooleanField(
+        null=True, blank=True,
         default=False, verbose_name='has X-ray',
         help_text='True when the target has X-ray data.'
     )
     has_gamma = models.BooleanField(
+        null=True, blank=True,
         default=False, verbose_name='has gamma',
         help_text='True when the target has gamma-ray data.'
     )
     has_polarimetry = models.BooleanField(
+        null=True, blank=True,
         default=False, verbose_name='has polarimetry',
         help_text='True when the target has polarimetry data.'
     )
