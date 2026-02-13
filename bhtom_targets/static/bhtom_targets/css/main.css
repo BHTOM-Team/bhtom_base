@@ -28,3 +28,29 @@ span.featured {
 .target-right > * {
   width: 1000px;
 }
+
+#tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+#tabs .nav-item,
+#tabs .nav-link {
+  white-space: nowrap;
+}
+
+#tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+#tabs .nav-item,
+#tabs .nav-link {
+  white-space: nowrap;
+}
