@@ -14,7 +14,7 @@
         showCooGrid: false, showCooGridControl: true,
         expandLayersControl: false});
 
-        var planets = JSON.parse({{ planets|safe }});
+        var planets = {{ planets|safe }};
         
         {% comment %} var circleM = A.circle(planets.moon_ra, planets.moon_dec, 30, {color: 'grey', lineWidth: 1});
         var overlayM = A.graphicOverlay({name: 'Moon 30 deg',color: 'grey', lineWidth: 1});
@@ -39,7 +39,7 @@
         
         
         // Get the targets from the Django template context
-        var targets = JSON.parse({{ targets|safe }});
+        var targets = {{ targets|safe }};
         
         // Loop over each target and add it to the Aladin Lite viewer
         var markers_list = [];
