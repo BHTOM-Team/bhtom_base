@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import json
+import math
 
 from astroplan import moon_illumination
 from astropy import units as u
@@ -282,9 +284,15 @@ def target_distribution(targets):
         classification=target.classification
         if classification is None: classification='-'
         mag_last = target.mag_last
-        if mag_last is None: mag_last='-'
+        if mag_last is None or (isinstance(mag_last, float) and math.isnan(mag_last)): 
+            mag_last='-'
         ra = target.ra
         dec = target.dec
+        # Convert NaN to None for proper JSON serialization
+        if ra is not None and isinstance(ra, float) and math.isnan(ra):
+            ra = None
+        if dec is not None and isinstance(dec, float) and math.isnan(dec):
+            dec = None
         name = target.name
         targets_info.append({'name':name, 'ra':ra, 'dec':dec, 'classification':classification,'mag_last':mag_last})
 #    targets_list = list(targets.values('ra', 'dec','name'))  # replace 'field1', 'field2' with actual field names
@@ -303,7 +311,11 @@ def target_distribution(targets):
     'moon_dec': delta_moon
     }
     
-    return {'targets': targets_info, 'planets':planets}
+    # Serialize to JSON to avoid Python nan vs JavaScript NaN issues
+    targets_json = json.dumps(targets_info)
+    planets_json = json.dumps(planets)
+    
+    return {'targets': targets_json, 'planets': planets_json}
 
 
 @register.filter
