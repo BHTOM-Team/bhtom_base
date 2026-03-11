@@ -14,7 +14,7 @@
         showCooGrid: false, showCooGridControl: true,
         expandLayersControl: false});
 
-        var planets = {{ planets|safe}};
+        var planets = JSON.parse({{ planets|safe }});
         
         {% comment %} var circleM = A.circle(planets.moon_ra, planets.moon_dec, 30, {color: 'grey', lineWidth: 1});
         var overlayM = A.graphicOverlay({name: 'Moon 30 deg',color: 'grey', lineWidth: 1});
@@ -39,12 +39,17 @@
         
         
         // Get the targets from the Django template context
-        var targets = {{ targets|safe }};
+        var targets = JSON.parse({{ targets|safe }});
         
         // Loop over each target and add it to the Aladin Lite viewer
         var markers_list = [];
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
+            // Skip targets without valid coordinates
+            if (target.ra === null || target.dec === null || 
+                isNaN(target.ra) || isNaN(target.dec)) {
+                continue;
+            }
             //            document.write(target.ra);
             var marker = A.marker(target.ra, target.dec, 
             {popupTitle: '<a target="_blank" href="'+target.name+'">'+target.name+'</a>',
