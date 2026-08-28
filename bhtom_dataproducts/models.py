@@ -603,6 +603,7 @@ class CCDPhotJob(CleanData):
     fits_seeing = models.FloatField(null=True, blank=True, help_text='SEEING - atmospheric seeing in arcseconds')
     fits_airmass = models.FloatField(null=True, blank=True, help_text='AIRMASS - airmass at observation')
     fits_photflag = models.IntegerField(null=True, blank=True, help_text='PHOTFLAG - photometric flag')
+    fits_commflag = models.IntegerField(null=True, blank=True, help_text='COMMFLAG - communication flag')
     fits_moonelev = models.FloatField(null=True, blank=True, help_text='MOONELEV - moon elevation in degrees')
     fits_sunelev = models.FloatField(null=True, blank=True, help_text='SUNELEV - sun elevation in degrees')
     fits_moondist = models.FloatField(null=True, blank=True, help_text='MOONDIST - distance to moon in degrees')
