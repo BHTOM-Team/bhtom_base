@@ -282,6 +282,7 @@ class DataProduct(CleanData):
     status = models.CharField(max_length=1, choices=STATUS, default='C')
     photometry_data = models.URLField(null=True, blank=True, default=None)
     fits_data = models.URLField(null=True, blank=True, default=None)
+    fits_table_data = models.URLField(null=True, blank=True, default=None)
     fits_webp = models.FileField(upload_to=webp_data_path, null=True, default='')
     extra_data = models.TextField(blank=True, default='')
     group = models.ManyToManyField(DataProductGroup, blank=True)
