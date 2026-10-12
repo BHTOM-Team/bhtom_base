@@ -583,7 +583,8 @@ class CCDPhotJob(CleanData):
     ccdphot_result = models.TextField(null=True, blank=True, editable=False)
     ccdphot_result_file = models.TextField(null=True, blank=True, editable=False)
     ccdphot_stdout_file = models.TextField(null=True, blank=True, editable=False)
-
+    table_fits_result_file = models.TextField(null=True, blank=True, editable=False)
+    
     fits_object = models.CharField(max_length=70, null=True, blank=True)
     fits_ra = models.FloatField(default=0.0, null=True, blank=True)
     fits_dec = models.FloatField(default=0.0, null=True, blank=True)
